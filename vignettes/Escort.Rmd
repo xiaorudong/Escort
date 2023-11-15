@@ -16,11 +16,54 @@ knitr::opts_chunk$set(echo = TRUE,
                       dpi = 300)
 ```
 
+
+```{r, warning=F, message=F}
+library(Escort)
+set.seed(11111)
+```
+
 # Introduction
 
 `Escort` is an R package designed to assist users in detecting trajectories, evaluating and ranking various analysis choices. It follows a three-step approach, guiding users through the analysis process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis choices. This encompasses features like feature selection, dimension reduction, and trajectory inference methods, along with their respective hyperparameters.
 
 
-```{r setup}
+# Run Escort
+After successful installation, the package must be loaded into the working space:
+
+```{r, eval=TRUE}
 library(Escort)
+library(parallelDist) # for fast calculation of the distance matrix.
 ```
+
+
+# Data 
+
+We'll start by reading in a simulated scRNA-seq data with a simple trajectory structure that is linear topology. 
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+load("data/step0_clean_dyntoy_L3.RData")
+```
+
+Escort employs a three-step approach to guide users through the analysis by detecting the presence of trajectories and then providing goodness-of-fit evaluations of embeddings. 
+
+## Step1: Assessing whether the data support the existence of a trajectory
+
+We identified two scenarios where trajectory fitting is not appropriate: when cells represent diverse cell types or when cells are homogeneous. The input dataset is a data matrix of normalized single-cell RNA-seq data. 
+
+### Identifing distinct cell types
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(parallelDist)
+dist_mat <- parallelDist::parDist(t(norm_counts), method = "manhattan")
+LvsC <- HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=rawcounts)
+LvsC$DCcheck
+```
+
+### Assessing the homogeneity 
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+gene.var <- modelGeneVar(norm_counts)
+HVGs <- getTopHVGs(gene.var, n=100)
+cor_test <- testHomogeneous(HVGs=HVGs, norm_counts=norm_counts)
+cor_test$decision
+```
+
+
+

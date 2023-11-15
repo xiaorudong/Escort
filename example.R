@@ -1,4 +1,4 @@
-devtools::install("/Users/ruby/Downloads/Rpackage/Escort")
+devtools::install("/Users/ruby/Desktop/Graduate/Research/Escort")
 
 
 library(Escort)
