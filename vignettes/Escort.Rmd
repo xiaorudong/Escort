@@ -1,0 +1,26 @@
+---
+title: "Escort"
+author: "Xiaoru Dong"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Escort}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      warning = FALSE, 
+                      error = FALSE, 
+                      fig.align = "center", 
+                      dpi = 300)
+```
+
+# Introduction
+
+`Escort` is an R package designed to assist users in detecting trajectories, evaluating and ranking various analysis choices. It follows a three-step approach, guiding users through the analysis process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis choices. This encompasses features like feature selection, dimension reduction, and trajectory inference methods, along with their respective hyperparameters.
+
+
+```{r setup}
+library(Escort)
+```

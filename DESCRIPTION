@@ -1,0 +1,43 @@
+Package: Escort
+Type: Package
+Title: Escort: Data-driven Selection of Trajectory
+Version: 0.1.0
+Authors@R: c(person("Xiaoru", "Dong", , "xdong1@ufl.edu", role = c("aut", "cre"), comment = c(ORCID = "0000-0003-3039-3004")), 
+             person(given = "Rhonda", family = "Bacher", email = "rbacher@ufl.edu", role = c("ctb", "fnd"), comment = c(ORCID = "0000-0001-5787-476X")))
+Description: A novel data-driven evaluation framework for trajectory inference. 
+    Escort simplifies trajectory analysis using a three-step approach to guide users through 
+    the analysis by providing goodness of fit evaluations.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.2.3
+Imports: 
+    alphahull,
+    devtools,
+    fastICA,
+    FNN,
+    graphics,
+    grDevices,
+    jmuOutlier,
+    NbClust,
+    plyr,
+    RColorBrewer,
+    rstatix,
+    Rtsne,
+    S4Vectors,
+    SC3,
+    scales,
+    scLCA,
+    SCORPIUS,
+    sfsmisc,
+    shotGroups,
+    SingleCellExperiment,
+    stats,
+    umap,
+    univOutl
+Remotes: github::hemberg-lab/SC3, bitbucket::scLCA/single_cell_lca
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr
