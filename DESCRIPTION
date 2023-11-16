@@ -28,6 +28,7 @@ Imports:
     scales,
     scLCA,
     SCORPIUS,
+    scran,
     sfsmisc,
     shotGroups,
     SingleCellExperiment,

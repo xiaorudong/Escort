@@ -1,6 +1,6 @@
 #' Test Homogeneous
 #'
-#' @param HVGs Highly variable genes
+#' @param HVGs Highly variable genes. If there is no input of the highly variable genes, they will be calcualted by `modelGeneVar()` function.
 #' @param norm_counts A normalized count data matrix: row:genes, column:cells
 #' @param n The number of highly variable genes to test
 #' @param num.sim The number of simulations generated for permutation test on spearman correlation
@@ -8,6 +8,7 @@
 #' @importFrom jmuOutlier perm.cor.test
 #' @import stats
 #' @import S4Vectors
+#' @import scran
 #'
 #' @return A list about the results of trajectory signal detection
 #' \itemize{
@@ -16,7 +17,11 @@
 #' }
 #' @export
 
-testHomogeneous <- function(HVGs, norm_counts, n=100, num.sim = 20000) {
+testHomogeneous <- function(HVGs=NULL, norm_counts, n=100, num.sim = 20000) {
+  if(is.null(HVGs)) {
+    gene.var <- scran::modelGeneVar(norm_counts)
+    HVGs <- scran::getTopHVGs(gene.var)
+  }
   if(length(HVGs)<20) return("Please input more highly variable genes.")
 
   pcDat <- prcomp(t(norm_counts))
