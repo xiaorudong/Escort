@@ -2,9 +2,16 @@ devtools::install("/Users/ruby/Desktop/Graduate/Research/Escort")
 
 
 library(Escort)
+library(parallelDist) # for fast calculation of the distance matrix.
+library(cluster)
+library(mclust)
+library(RMTstat)
+library(scuttle)
+library(scran)
 
-setwd("/Volumes/bachergroup/TrajectoryEvaluation_Method/")
-load("RDATA/step0_clean_dyntoy_L3.RData")
+
+# setwd("/Users/ruby/Desktop/Graduate/Research/Escort/")
+load("data/step0_clean_dyntoy_L3.RData")
 
 
 #########################
@@ -12,8 +19,6 @@ load("RDATA/step0_clean_dyntoy_L3.RData")
 #########################
 
 # test distinct clusters
-library(parallelDist)
-par(mfrow = c(2, 2))
 dist_mat <- parallelDist::parDist(t(norm_counts), method = "manhattan")
 LvsC <- HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=rawcounts)
 LvsC$DCcheck
@@ -28,6 +33,12 @@ cor_test$decision
 #########################
 ######### step2 #########
 #########################
+
+gene.var <- modelGeneVar(norm_counts)
+genes.HVGs_1 <- getTopHVGs(gene.var, prop=0.2)
+dimred <- getDR_2D(norm_counts, "PCA")
+head(dimred)
+
 
 library(slingshot)
 library(DescTools)

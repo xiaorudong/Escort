@@ -89,7 +89,6 @@ LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
                                connectedCells=NULL, checksize=NULL) {
 
   if(is.null(K)) {
-    library(NbClust)
     res.nbclust <- NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
     K <- length(unique(res.nbclust$Best.partition))
     c_cl <- res.nbclust$Best.partition
