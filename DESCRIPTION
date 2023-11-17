@@ -17,9 +17,11 @@ Imports:
     FNN,
     graphics,
     grDevices,
+    Hmisc,
     jmuOutlier,
     plyr,
     RColorBrewer,
+    robustbase,
     rstatix,
     Rtsne,
     S4Vectors,
@@ -32,8 +34,7 @@ Imports:
     shotGroups,
     SingleCellExperiment,
     stats,
-    umap,
-    univOutl
+    umap
 Remotes: github::hemberg-lab/SC3, bitbucket::scLCA/single_cell_lca
 Suggests: 
     knitr,

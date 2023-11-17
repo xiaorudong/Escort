@@ -2,10 +2,10 @@
 #'
 #' @param obj A trajectory evaluation object from \code{prepTraj} function
 #' @param outlierdetect The method used to detect the outlier: "resistant", "adjbox", "asymmetric", "neutral". The default method is "neutral"
+#' @param fig A figure showing the where are ambiguous cells.
 #'
 #' @importFrom FNN get.knn
 #' @importFrom scales alpha
-#' @importFrom univOutl boxB
 #' @importFrom plyr round_any
 #' @import RColorBrewer
 #' @import graphics
@@ -19,7 +19,7 @@
 #'
 #' @export
 
-UshapeDetector <- function(obj, outlierdetect='neutral') {
+UshapeDetector <- function(obj, outlierdetect='neutral', fig=F) {
 
   dimred <- obj$Embedding
   pse <- obj$pse
@@ -40,7 +40,7 @@ UshapeDetector <- function(obj, outlierdetect='neutral') {
   knn_index <- knn_obj$nn.index
   knn_dist <- knn_obj$nn.dist
 
-  outdect <- univOutl::boxB(x = as.vector(knn_dist), k = 1.5, method = 'adjbox')
+  outdect <- Escort::boxB(x = as.vector(knn_dist), k = 1.5, method = 'adjbox')
   upperB <- outdect$fences[2]
   filter_ind <- which(knn_dist > upperB, arr.ind = TRUE)
   if(sum(knn_dist > upperB)>0) {
@@ -60,13 +60,13 @@ UshapeDetector <- function(obj, outlierdetect='neutral') {
     knn_pt <- matrix(apply(knn_index, 1, function(x) lineage_pse[x]), ncol = num, byrow = T)
     knn_sd <- apply(knn_pt, 1, function(x) sd(x, na.rm = T))
 
-    outdect0 <- univOutl::boxB(x = knn_sd, k = 1.5, method="resistant")
+    outdect0 <- Escort::boxB(x = knn_sd, k = 1.5, method="resistant")
     upperB0 <- outdect0$fences[2]
 
-    outdect1 <- univOutl::boxB(x = knn_sd, k = 1.5, method="adjbox")
+    outdect1 <- Escort::boxB(x = knn_sd, k = 1.5, method="adjbox")
     upperB1 <- outdect1$fences[2]
 
-    outdect2 <- univOutl::boxB(x = knn_sd, k = 1.5, method="asymmetric")
+    outdect2 <- Escort::boxB(x = knn_sd, k = 1.5, method="asymmetric")
     upperB2 <- outdect2$fences[2]
 
     upperB12 <- median(knn_sd[knn_sd<=max(upperB1, upperB2) & knn_sd>=min(upperB1, upperB2)], na.rm = T)
@@ -86,15 +86,17 @@ UshapeDetector <- function(obj, outlierdetect='neutral') {
   allHR_cells <- unique(HR_cells_vec)
   allHR.no <- length(unique(HR_cells_vec))
 
-  colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
-  pse$Ave <- rowMeans(pse, na.rm = T)
-  plotcol <- colors[cut(pse$Ave, breaks=100)]
-  plot(dimred, col = scales::alpha(plotcol, 0.7), pch=16)
-  segments(x0 = fitLine$x0,
-           y0 = fitLine$y0,
-           x1 = fitLine$x1,
-           y1 = fitLine$y1, lwd = 3)
-  points(dimred[allHR_cells,1], dimred[allHR_cells,2], col = "black", pch=16)
+  if(fig) {
+    colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+    pse$Ave <- rowMeans(pse, na.rm = T)
+    plotcol <- colors[cut(pse$Ave, breaks=100)]
+    plot(dimred, col = scales::alpha(plotcol, 0.7), pch=16)
+    segments(x0 = fitLine$x0,
+             y0 = fitLine$y0,
+             x1 = fitLine$x1,
+             y1 = fitLine$y1, lwd = 3)
+    points(dimred[allHR_cells,1], dimred[allHR_cells,2], col = "black", pch=16)
+  }
 
   allHR_rate <- allHR.no/nrow(dimred)
   return(list(AmbiguousCells=allHR_cells, NoACells=allHR.no, Ambpct=allHR_rate))

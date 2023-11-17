@@ -4,12 +4,14 @@
 \alias{GOFeval}
 \title{Goodness of Fit}
 \usage{
-GOFeval(dimred, alpha = NULL)
+GOFeval(dimred, alpha = NULL, fig = F)
 }
 \arguments{
 \item{dimred}{A data frame. a 2D embedding from a DR method}
 
 \item{alpha}{alpha value to calculate the alpha-convex hull. If left NULL, the alpha will be calculated based on the  first derivative.}
+
+\item{fig}{A figure showing the cell distribution area.}
 }
 \value{
 A list about the results of the GOF

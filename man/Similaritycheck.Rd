@@ -4,7 +4,7 @@
 \alias{Similaritycheck}
 \title{Structure Similarity between Orignal data and Embedding}
 \usage{
-Similaritycheck(Cluters, norm_counts, dimred)
+Similaritycheck(Cluters, norm_counts, dimred, fig = F)
 }
 \arguments{
 \item{Cluters}{object from \code{DCClusterscheck} fucntion.}
@@ -12,6 +12,8 @@ Similaritycheck(Cluters, norm_counts, dimred)
 \item{norm_counts}{a normalized count data matrix: row:genes, column:cells}
 
 \item{dimred}{A data frame. a 2D embedding from a DR method and the row name is the cell name.}
+
+\item{fig}{A figure showing the clusters identified in raw data in the embedding}
 }
 \value{
 A list about the results of structure similarity check between high- and low- dimenaional data.

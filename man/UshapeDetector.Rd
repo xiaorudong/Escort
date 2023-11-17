@@ -4,12 +4,14 @@
 \alias{UshapeDetector}
 \title{Check the shape of trajectory curves}
 \usage{
-UshapeDetector(obj, outlierdetect = "neutral")
+UshapeDetector(obj, outlierdetect = "neutral", fig = F)
 }
 \arguments{
 \item{obj}{A trajectory evaluation object from \code{prepTraj} function}
 
 \item{outlierdetect}{The method used to detect the outlier: "resistant", "adjbox", "asymmetric", "neutral". The default method is "neutral"}
+
+\item{fig}{A figure showing the where are ambiguous cells.}
 }
 \value{
 A list about the results of structure similarity check between high- and low- dimenaional data.

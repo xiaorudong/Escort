@@ -5,6 +5,7 @@
 #' @param Cluters object from \code{DCClusterscheck} fucntion.
 #' @param norm_counts a normalized count data matrix: row:genes, column:cells
 #' @param dimred A data frame. a 2D embedding from a DR method and the row name is the cell name.
+#' @param fig A figure showing the clusters identified in raw data in the embedding
 #'
 #' @importFrom FNN get.knn
 #' @importFrom scales alpha
@@ -19,7 +20,7 @@
 #'
 #' @export
 
-Similaritycheck <- function(Cluters, norm_counts, dimred) {
+Similaritycheck <- function(Cluters, norm_counts, dimred, fig=F) {
 
   dimred <- as.data.frame(dimred)
   dimred <- dimred[colnames(norm_counts),]
@@ -35,9 +36,11 @@ Similaritycheck <- function(Cluters, norm_counts, dimred) {
 
   good_rate <- sum(t_knn[as.numeric(names(t_knn))<=1])/ncol(norm_counts)
 
-  plotcol <- as.numeric(as.factor(cut_avg))
+  if(fig) {
+    plotcol <- as.numeric(as.factor(cut_avg))
 
-  plot(dimred, col = scales::alpha(plotcol,0.7), pch=16)
+    plot(dimred, col = scales::alpha(plotcol,0.7), pch=16)
+  }
 
   return(list(SimilarityLevel=t_knn, GoodRate=good_rate, all=knn_overlap, cls=cut_avg))
 }
@@ -48,6 +51,7 @@ Similaritycheck <- function(Cluters, norm_counts, dimred) {
 #'
 #' @param dimred A data frame. a 2D embedding from a DR method
 #' @param alpha alpha value to calculate the alpha-convex hull. If left NULL, the alpha will be calculated based on the  first derivative.
+#' @param fig A figure showing the cell distribution area.
 #'
 #' @import alphahull
 #' @importFrom shotGroups getMinCircle
@@ -62,7 +66,7 @@ Similaritycheck <- function(Cluters, norm_counts, dimred) {
 #' }
 #' @export
 
-GOFeval <- function(dimred, alpha=NULL) {
+GOFeval <- function(dimred, alpha=NULL, fig=F) {
 
   dimred <- as.data.frame(dimred)
 
@@ -105,13 +109,17 @@ GOFeval <- function(dimred, alpha=NULL) {
 
     outline_dimred <- alphahull::ahull(clean_dimred, alpha=alpha)
     area <- alphahull::areaahull(outline_dimred)
-    plot(outline_dimred)
-    points(dimred[rownames(dimred) %in% outliers,1], dimred[rownames(dimred) %in% outliers,2])
+    if(fig) {
+      plot(outline_dimred)
+      points(dimred[rownames(dimred) %in% outliers,1], dimred[rownames(dimred) %in% outliers,2])
+    }
   } else {
     outline_dimred <- alphahull::ahull(clean_dimred, alpha=alpha)
     area <- alphahull::areaahull(outline_dimred)
-    plot(outline_dimred)
-    points(dimred[rownames(dimred) %in% outliers,1], dimred[rownames(dimred) %in% outliers,2])
+    if(fig) {
+      plot(outline_dimred)
+      points(dimred[rownames(dimred) %in% outliers,1], dimred[rownames(dimred) %in% outliers,2])
+    }
   }
 
   op_rate <- round(area/circlearea, 3)
