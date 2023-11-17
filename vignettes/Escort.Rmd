@@ -32,15 +32,14 @@ After successful installation, `Escort` and related packages need be loaded into
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 library(Escort)
-library(parallelDist) # for fast calculation of the distance matrix.
+library(parallelDist) #  using a fast calculation method for the distance matrix
 library(cluster)
 library(mclust)
 library(RMTstat)
 ```
+### Example data for single-cell data
 
-
-# Data 
-In this vignette, I'll be using a simulated scRNA-seq dataset featuring a linear trajectory structure.
+Below we show an example using a simulated single-cell RNA-seq dataset from Saelens et al., 2019, accessible at (https://zenodo.org/records/1443566). This simulated scRNA-seq dataset is characterized by a linear topology structure. After cleaning the dataset, we use the normalized and raw data sets to do following anlaysis.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 load("data/step0_clean_dyntoy_L3.RData")
@@ -50,7 +49,7 @@ Escort employs a three-step approach to guide users through the analysis by dete
 
 ## Step1: Detecting Trajectory Existence 
 
-We identified two scenarios where trajectory fitting is not appropriate: when cells represent diverse cell types or when cells are homogeneous. The input in the step 1 is matrixes of raw and normalized single-cell RNA-seq data after quality control. The `HD_DCClusterscheck()` function is utilized to identify diverse cell types, while the `testHomogeneous()` function aids in assessing homogeneity
+We identified two scenarios where trajectory fitting is not appropriate: when cells represent diverse cell types or when cells are homogeneous. The input in the step 1 is matrixes of raw and normalized single-cell RNA-seq data after quality control. The `HD_DCClusterscheck()` function is utilized to identify diverse cell types, while the `testHomogeneous()` function aids in assessing homogeneity.
 
 ### Identifing distinct cell types
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
@@ -68,7 +67,7 @@ cor_test$decision
 ## Step 2: Evaluating the Characteristics of Embeddings
 The second step is designed to identify preferred embeddings for performing trajectory inference. 
 
-For feature selection, we could select any number of highly variable genes. Escort provides well-known dimension reduction algorithms for generating embeddings, such as UMAP, t-SNE, MDS, and PCA. For example, we apply the PCA algorithm, utilizing the top 20% of highly variable genes for the dimension reduction process. The `modelGeneVar()` function is employed here to identify highly variable genes.
+For feature selection, we could select any number of highly variable genes. Escort provides well-known dimension reduction algorithms for generating embeddings, such as UMAP, t-SNE, MDS, and PCA through the `getDR_2D()` function. For example, we apply the PCA algorithm, utilizing the top 20% of highly variable genes for the dimension reduction process. The `modelGeneVar()` function from `scarn` package is employed here to identify highly variable genes.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(scran)
@@ -84,7 +83,8 @@ head(dimred)
 We evaluate cell connectivity on the lower dimensional embedding using the `LD_DCClusterscheck()` function. Since distinct clusters have already been eliminated in step 1, then a reliable embedding should not exhibit distinct clusters. Thus, any embeddings found to be disconnected are classified immediately as not recommended. 
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-DRLvsC <- LD_DCClusterscheck(dist_mat=dist(dimred, method = "euclidean"), DRdims=dimred, connectedCells = 1)
+dist_mat <- dist(dimred, method = "euclidean")
+DRLvsC <- LD_DCClusterscheck(dist_mat=dist_mat, DRdims=dimred, connectedCells = 1)
 DRLvsC$DCcheck
 ```
 ### Examining preservation of cell relationships
@@ -154,3 +154,12 @@ scoredf <- data.frame(DCcheck=DRLvsC$ifConnected, SimiRetain=simi_cells$GoodRate
 score_cal(scoredf)
 ```
 
+
+
+
+
+# SessionInfo
+
+```{r sessionInfo, results='markup'}
+sessionInfo()
+```
