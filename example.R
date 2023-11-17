@@ -33,7 +33,7 @@ cor_test$decision
 
 gene.var <- modelGeneVar(norm_counts)
 genes.HVGs <- getTopHVGs(gene.var, prop=0.2)
-dimred <- getDR_2D(norm_counts[genes.HVGs,], "PCA")
+dimred <- getDR_2D(norm_counts[genes.HVGs,], "MDS")
 head(dimred)
 
 # check if embedding has distinct clusters

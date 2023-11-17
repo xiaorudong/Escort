@@ -78,7 +78,7 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 #' @param connectedCells The minimum number of connected cells between clusters used to identify their connection. If left NULL, the default value is 10.
 #' @param checksize The number of neighbors to consider for each check cell to determine their connectivity. If left NULL, the value is set to be equal to "checkcells".
 #'
-#' @import NbClust stats
+#' @import stats
 #'
 #' @return A list about the results of disconnected clusters detection.
 #' @export
@@ -89,7 +89,7 @@ LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
                                connectedCells=NULL, checksize=NULL) {
 
   if(is.null(K)) {
-    res.nbclust <- NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
+    res.nbclust <- Escort::NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
     K <- length(unique(res.nbclust$Best.partition))
     c_cl <- res.nbclust$Best.partition
     # names(c_cl) <- rownames(DRdims)
