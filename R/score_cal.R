@@ -42,6 +42,7 @@ score_cal <- function(scoredf, SimiRetaincutoff=0, GOFcutoff=0.53, URATEcutoff=0
                                                                      ifelse(!dc, "Disconnected Clusters", "Poor Cell Relationship"))
     final_scoredf$decision[final_scoredf$decision=="very bad"] <- "Non-recommended Embeddings"
   }
+  final_scoredf <- final_scoredf[order(final_scoredf$score, decreasing = T), ]
   return(final_scoredf)
 }
 

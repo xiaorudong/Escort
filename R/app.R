@@ -7,6 +7,7 @@
 #' @import shiny
 #' @import shinyWidgets
 #' @import scran
+#' @import mclust
 #' @import slingshot
 #' @importFrom scales alpha
 #' @import RColorBrewer

@@ -1,4 +1,8 @@
 
+library(shinydashboard)
+library(shiny)
+library(shinyjs)
+library(shinycssloaders)
 js <- '.nav-tabs-custom .nav-tabs li.active {
     border-top-color: #f39c12;
 }"'

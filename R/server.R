@@ -1,11 +1,19 @@
+library(parallelDist)
+library(mclust)
+library(scales)
+library(slingshot)
+library(DT)
+library(RColorBrewer)
+library(shinyjs)
+
 
 server <- function(input, output) {
   # add image:
   output$home_img <- renderImage({
 
-    list(src = "header_img.png",
-         width = 638,
-         height = 335)
+    list(src = "vignettes/Workflow.png",
+         width = 600,
+         height = 400)
 
   }, deleteFile = F)
 
