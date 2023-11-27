@@ -5,6 +5,9 @@ library(slingshot)
 library(DT)
 library(RColorBrewer)
 library(shinyjs)
+library(dplyr)
+library(Seurat)
+library(clusterProfiler)
 
 
 server <- function(input, output) {
@@ -31,47 +34,79 @@ server <- function(input, output) {
   })
 
   # begin analysis
+  mydf <- reactiveValues(
+    raw = NULL,
+    norm = NULL,
+    from = FALSE)
 
-  output$no_genes <- renderValueBox({
-    if(is.null(rawcounts())) return(NULL)
-    raw_mat <- rawcounts()
-    num_genes <- nrow(raw_mat)
-    num_cells <- ncol(raw_mat)
-
-    valueBox(
-      value = num_genes,
-      subtitle = "Number of Genes After QC",
-      icon = icon("dna"),
-      color = "orange"
-    )
+  ### load data
+  observeEvent(input$upload, {
+    mydf$raw <- rawcounts()
+    mydf$norm <- norm_counts()
+    mydf$from <- all(dim(rawcounts())==dim(norm_counts()))
+  })
+  ### clear button
+  observeEvent(input$reset, {
+    mydf$raw <- NULL
+    mydf$norm <- NULL
+    mydf$from <- FALSE
   })
 
-  output$no_cells <- renderValueBox({
-    if(is.null(rawcounts())) return(NULL)
-    raw_mat <- rawcounts()
-    num_genes <- nrow(raw_mat)
-    num_cells <- ncol(raw_mat)
+  output$no_genes <- renderValueBox({
+    if(mydf$from) {
+      valueBox(
+        value = nrow(mydf$norm),
+        subtitle = "Number of Genes",
+        icon = icon("dna"),
+        color = "orange"
+      )
+    } else {
+      valueBox(
+        value = NA,
+        subtitle = "Number of Genes",
+        icon = icon("dna"),
+        color = "orange"
+      )
+    }
+  })
 
-    valueBox(
-      value = num_cells,
-      subtitle = "Number of Cells After QC",
-      icon = icon("table"),
-      color = "blue"
-    )
+  output$uploadnote <- renderText({
+    if(mydf$from) return("Find datasets. Begin analysis.")
+    if(!mydf$from) return("No qualified datasets.")
+    })
+
+
+  output$no_cells <- renderValueBox({
+
+    if(mydf$from) {
+      valueBox(
+        value = ncol(mydf$norm),
+        subtitle = "Number of Cells",
+        icon = icon("table"),
+        color = "blue"
+      )
+    } else {
+      valueBox(
+        value = NA,
+        subtitle = "Number of Cells",
+        icon = icon("table"),
+        color = "blue"
+      )
+    }
   })
 
 
   # Test DC in HighDim:
   step1_test2 <- reactive({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
-    norm_mat <- norm_counts()
-    raw_mat <- rawcounts()
+    if(!mydf$from) return(NULL)
+    norm_mat <- mydf$norm
+    raw_mat <- mydf$raw
     dist_mat <- parDist(t(norm_mat), method = "manhattan")
     HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=raw_mat)
   })
 
   output$step1_dc <- renderText({
-    if(is.null(rawcounts()) & is.null(norm_counts()) & is.null(step1_test2())) return(NULL)
+    if(!mydf$from & is.null(step1_test2())) return(NULL)
     ifelse(step1_test2()$ifConnected,
            "No. We didn't detect disconnected clusters.",
            "Yes. Upon detecting disconnected clusters, it signified the presence of diverse cell types,
@@ -82,7 +117,7 @@ server <- function(input, output) {
   # DE in DC clusters:
   step1_de <- reactive({
     if(!step1_test2()$ifConnected) {
-      raw_mat <- rawcounts()
+      raw_mat <- mydf$raw
       cls <- step1_test2()$Clusters
       df <- Escort::DE_seurat(rawcounts=raw_mat, cls=cls)
       return(df)
@@ -90,7 +125,7 @@ server <- function(input, output) {
   })
 
   output$dc_de_tb <-  DT::renderDT({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
+    if(!mydf$from) return(NULL)
     if(is.null(step1_test2())) return(NULL)
     if(step1_test2()$ifConnected) return(NULL)
     datatable(step1_de(),rownames = TRUE, filter = 'top')%>%
@@ -100,14 +135,14 @@ server <- function(input, output) {
 
   # Test Homogeneous:
   step1_test1 <- reactive({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
-    norm_mat <- norm_counts()
+    if(!mydf$from) return(NULL)
+    norm_mat <- mydf$norm
     testHomogeneous(norm_counts=norm_mat, num.sim = 1000)
   })
 
   output$step1_homogeneous <- renderText({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
-    ifelse(step1_test1()$signal_pct>0.5,
+    if(!mydf$from) return(NULL)
+    ifelse(step1_test1()$signal_pct>=0.46,
            "No. We could detect the trajectory signal.",
            "Yes. In the absence of a detected trajectory signal, it suggested the presence of a homogeneous dataset,
            rendering trajectory fitting inappropriate. To support this assessment, we present the results of
@@ -116,17 +151,17 @@ server <- function(input, output) {
 
   # HVGs in Homogeneous cells:
   step1_hvgs <- reactive({
-    if(step1_test1()$signal_pct<=0.5) {
-      norm_mat <- norm_counts()
+    if(step1_test1()$signal_pct<0.46) {
+      norm_mat <- mydf$norm
       df <- Escort::HVGs_scran(norm_counts=norm_mat)
       return(df)
     }
   })
 
   output$homo_hvgs_tb <-  DT::renderDT({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
+    if(!mydf$from) return(NULL)
     if(is.null(step1_test1())) return(NULL)
-    if(step1_test1()$signal_pct>0.5) return(NULL)
+    if(step1_test1()$signal_pct>=0.46) return(NULL)
     datatable(step1_hvgs(),rownames = TRUE, filter = 'top')%>%
       DT::formatStyle(names(step1_de()),lineHeight='80%')
   })
@@ -134,24 +169,24 @@ server <- function(input, output) {
   # HVGs in GO enrichment:
   step1_go <- reactive({
     if(is.null(input$go_info)) return(NULL)
-    if(step1_test1()$signal_pct<=0.5) {
-      norm_mat <- norm_counts()
+    if(step1_test1()$signal_pct<0.46) {
+      norm_mat <- mydf$norm
       df <- Escort::HVGs_GO(norm_counts=norm_mat, OrgDb = input$go_info)
       return(df)
     }
   })
 
   output$homo_go_txt <- renderText({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
+    if(!mydf$from) return(NULL)
     if(is.null(step1_test1())) return(NULL)
-    if(step1_test1()$signal_pct>0.5) return(NULL)
+    if(step1_test1()$signal_pct>=0.46) return(NULL)
     if(is.null(step1_go())) return("There is no gene overlapping between Gene Ontology (GO) sets.")
   })
 
   output$homo_go_tb <- DT::renderDT({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
+    if(!mydf$from) return(NULL)
     if(is.null(step1_test1())) return(NULL)
-    if(step1_test1()$signal_pct>0.5) return(NULL)
+    if(step1_test1()$signal_pct>=0.46) return(NULL)
     if(is.null(step1_go())) return(NULL)
     datatable(step1_go(),rownames = TRUE, filter = 'top',
               options = list(
@@ -164,16 +199,16 @@ server <- function(input, output) {
 
   # step1_decision
   step1_res <- reactive({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
-    step1_test1()$signal_pct>0.5 && step1_test2()$ifConnecte
+    if(!mydf$from) return(NULL)
+    step1_test1()$signal_pct>=0.46 && step1_test2()$ifConnecte
   })
 
   output$step1_decision <- renderText({
-    if(is.null(rawcounts()) & is.null(norm_counts())) return(NULL)
+    if(!mydf$from) return(NULL)
     if(step1_res()) {
       "Go to STEP 2"
     } else {
-      "Not suitable for trajectory fitting. Check results in left column. "
+      "Not suitable for trajectory fitting. Check results in the left column. "
     }
 
   })
@@ -181,9 +216,9 @@ server <- function(input, output) {
 
   # Visualization
   output$step1_plot <- renderPlot({
-    if(is.null(rawcounts()) & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
-    norm_mat <- norm_counts()
-    raw_mat <- rawcounts()
+    if(!mydf$from & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
+    norm_mat <- mydf$norm
+    raw_mat <- mydf$raw
     # Visualization
     K <- step1_test2()$K
     par(mfrow=c(1,2))
@@ -208,10 +243,11 @@ server <- function(input, output) {
 
   step23_obj <- reactive({
     if(is.null(input$normfile)) return(NULL)
+    if(!mydf$from) return(NULL)
     # select genes:
-    gene.var <- scran::modelGeneVar(x=norm_counts())
+    gene.var <- scran::modelGeneVar(x=mydf$norm)
     genes.HVGs <- scran::getTopHVGs(stats=gene.var, n=input$checkgenes)
-    sub_counts <- norm_counts()[genes.HVGs,]
+    sub_counts <- mydf$norm[genes.HVGs,]
     # DR
     dimred <- getDR_2D(sub_counts, input$checkDR)
     # Trajectory
@@ -267,7 +303,7 @@ server <- function(input, output) {
   )
 
   # load data files
-  output$obj_files <- renderTable(input$objs[,1])
+  output$obj_files <- renderTable(input$objs[,1], colnames = F)
 
   all_files <- reactive({
     req(input$objs)
@@ -296,7 +332,7 @@ server <- function(input, output) {
     simi_cells <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      simi_cells[[names(all_files())[i]]] <- Similaritycheck(norm_counts=norm_counts(), dimred=subls$Embedding, Cluters=step1_test2())
+      simi_cells[[names(all_files())[i]]] <- Similaritycheck(norm_counts=mydf$norm, dimred=subls$Embedding, Cluters=step1_test2())
     }
     return(simi_cells)
   })

@@ -76,7 +76,12 @@ ui <- dashboardPage(
                               # read raw data after QC
                               fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv")),
                               # read norm data after QC
-                              fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv"))),
+                              fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv")),
+                              actionButton("upload", "Import"),
+                              actionButton('reset', 'Clear'),#Clear input dataset#
+                              hr(),
+                              textOutput(outputId = "uploadnote"),
+                              hr()),
                        column(width = 3,
                               # h4(strong("Data Info:")),
                               valueBoxOutput("no_cells", width = NULL),
@@ -143,14 +148,6 @@ ui <- dashboardPage(
 
               fluidRow(
                 column(width=6,
-                       h4(strong("Load Evaluation Objects:")),
-                       fluidRow(
-                         column(width=8,
-                                fileInput("objs", label = NULL, buttonLabel = "Upload rds file", accept = c(".rds"), multiple = TRUE))
-                         # ,
-                         # column(width=4, materialSwitch(inputId = "tostep23", label = "Pass Step 1", status = "success"))
-                         ),
-
                        box(
                          width=NULL, status = "primary", title = strong("Step 2: Evaluating the Characteristics of Embeddings"),
                          "The second step is designed to identify preferred embeddings for performing trajectory inference.
@@ -168,9 +165,12 @@ ui <- dashboardPage(
                          tableOutput(outputId  = "step2_structuretb")%>% withSpinner(color="#FAD02C")),
                        box(
                          width=NULL, title = "Determine the Cell Spread ", status = "warning",
-                         tableOutput(outputId = "step2_spreadtb")%>% withSpinner(color="#FAD02C"))),
-                column(width=6, tableOutput("obj_files"))
-
+                         tableOutput(outputId = "step2_spreadtb")%>% withSpinner(color="#FAD02C"))
+                       ),
+                column(width=3,
+                       h4(strong("Load Embeddings:")),
+                       fileInput("objs", label = NULL, buttonLabel = "Upload rds file", accept = c(".rds"), multiple = TRUE),
+                       tableOutput("obj_files"))
               )
       ),
 
@@ -197,9 +197,10 @@ ui <- dashboardPage(
                   "Given the above analysis, we provide a table showing the recommendations for
                 embedding choices based on whether embedding can preserve the original
                 data structure and whether the trajectory adequately reflects
-                the differentiation of the cells.We rate each embedding
+                the differentiation of the cells. We rate each embedding
                 according to their overall performance and provide suggestions
                 for selecting them.",
+                  hr(),
                   tableOutput(outputId = "final_res")%>% withSpinner(color="#FAD02C"))),
               fluidRow(
                 box(

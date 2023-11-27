@@ -4,6 +4,7 @@
 #' Runs the Escort Shiny app.
 #'
 #' @return This starts up the shiny app interface for Escort.
+#' @import Seurat
 #' @import shiny
 #' @import shinyWidgets
 #' @import scran
