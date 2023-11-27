@@ -57,15 +57,40 @@ ui <- dashboardPage(
       tabItem(tabName = "home",
               h3(strong("Welcome to Escort")),
               fluidRow(
-                align = "center",
-                imageOutput("home_img")),
-              "Escort is a data-driven three-step evaluation framework
-             made with the purpose of guiding researchers in selecting the optimal
-             methods for each step of trajectory inference based on various data
-             characteristics. Go to",
-              a(href = "https://github.com/NabiilahArdini/Shiny-Box",
-                "GitHub Page"),
-              "to find more details on the source code.", br()),
+                column(6,
+                       "Escort is a framework that uses data to evaluate
+                       how well different methods can infer trajectories
+                       from single-cell data. It employs a three-step approach to guide users
+                       through the analysis by providing goodness-of-fit (GOF) evaluations of embeddings
+                       representing a series of analysis choices including feature selection,
+                       dimension reduction, and trajectory inference methods.",
+                       br(),
+                       br(),
+                       "The first step is to check if the data have a trajectory signal or not.
+                       Sometimes, the data are not suitable for trajectory analysis,
+                       for example, when the cells come from biologically distinct clusters or
+                       sets of cells with insufficient heterogeneity. In these cases,
+                       Escort will tell the user that trajectory inference is not a good idea.",
+                       br(),
+                       br(),
+                       "The second step is to compare different low-dimensional embeddings and
+                       see how well they capture the relationships between cells
+                       in the original high-dimensional space.
+                       Escort also looks at how dense the cells are in the low-dimensional space,
+                       and prefers embeddings that have a tighter distribution for trajectory analysis.",
+                       br(),
+                       br(),
+                       "The third step is to evaluate how well a specific trajectory inference method
+                       works with a given embedding. This depends on the graph structure and other parameters
+                       that the method uses. Escort also measures how clear the projection of each cell
+                       is along the trajectory, and avoids methods that produce ambiguous results.
+                       Finally, Escort gives an overall score for each analysis option based on the three steps,
+                       and helps the user to find the best way to infer a trajectory from their data. Go to",
+                       a(href = "https://github.com/NabiilahArdini/Shiny-Box",
+                         "GitHub Page"),
+                       "to find more details on the source code.", br()),
+                column(6, imageOutput("home_img"))
+                )),
 
       tabItem(tabName = "step1",
               fluidRow(

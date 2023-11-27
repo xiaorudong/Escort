@@ -41,7 +41,7 @@ testHomogeneous <- function(HVGs=NULL, norm_counts, n=100, num.sim = 20000, seed
   padj <- p.adjust(p_vec_perm, method = "fdr")
   # res_perm_p <- mean(p_vec_perm<0.05)
   res_perm_padj <- mean(padj<0.05)
-  decision <- ifelse(res_perm_padj>0.46,
+  decision <- ifelse(res_perm_padj>=0.46,
                      "The trajectory signal is detected.",
                      "No trajectory signal is detected.")
 

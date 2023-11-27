@@ -16,8 +16,7 @@ server <- function(input, output) {
 
     list(src = "vignettes/Workflow.png",
          width = 600,
-         height = 400)
-
+         height = 500)
   }, deleteFile = F)
 
   # step0:
