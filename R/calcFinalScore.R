@@ -24,7 +24,7 @@ calcScore <- function(scoredf, SimiRetaincutoff=0, GOFcutoff=0.53, URATEcutoff=0
     rownames(df_norm) <- rownames(df)
     final_scoredf <- merge(scoredf, df_norm, by="row.names", all=T)
     final_scoredf$ranking[!is.na(final_scoredf$score)] <- rank(-final_scoredf$score, na.last = NA)
-    final_scoredf$decision <- ifelse(final_scoredf$score>0, "Recommended Embeddings", "Non-recommended Embeddings")
+    final_scoredf$decision <- ifelse(final_scoredf$score>0, "Recommended Embedding", "Non-recommended Embedding")
     final_scoredf$decision[is.na(final_scoredf$decision)] <- "very bad"
     final_scoredf$note <- rep(NA, nrow(final_scoredf))
   }else {
@@ -40,7 +40,7 @@ calcScore <- function(scoredf, SimiRetaincutoff=0, GOFcutoff=0.53, URATEcutoff=0
     final_scoredf$note <- rep(NA, nrow(final_scoredf))
     final_scoredf$note[final_scoredf$decision=="very bad"] <- ifelse(!(dc|simi), "Disconnected Clusters & Poor Cell Relationship",
                                                                      ifelse(!dc, "Disconnected Clusters", "Poor Cell Relationship"))
-    final_scoredf$decision[final_scoredf$decision=="very bad"] <- "Non-recommended Embeddings"
+    final_scoredf$decision[final_scoredf$decision=="very bad"] <- "Non-recommended Embedding"
   }
   final_scoredf <- final_scoredf[order(final_scoredf$score, decreasing = T), ]
   return(final_scoredf)

@@ -29,15 +29,15 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
     myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)[[1]]
     names(myclust.res) <- colnames(rawcounts)
     K <- max(myclust.res)
-  } 
-  
+  }
+
   # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
 	# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7444317/
 	# create a SingleCellExperiment object
 	sce <- SingleCellExperiment::SingleCellExperiment(
           	  assays = list(
           	    counts = as.matrix(rawcounts),
-          	    logcounts = log2(rawcounts + 1)), 
+          	    logcounts = log2(rawcounts + 1)),
           	  rowData = data.frame(feature_symbol = rownames(rawcounts))
           	  )
 
@@ -46,9 +46,9 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 	c_cl_raw <- SingleCellExperiment::colData(res)[,1]
 	c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
 	names(c_cl) <- rownames(SingleCellExperiment::colData(res))
-  
+
   K <- max(c_cl)
-  
+
 
 
   if (K==1) {
@@ -58,7 +58,7 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
   if (K>1) {
     if (any(table(c_cl)<=10)) {
       totSmall <- sum(table(c_cl)  <= 10)
-      return(list(DCcheck=paste0("There are ", K ," clusters detected total. However, ", totSmall, " clusters have fewer 
+      return(list(DCcheck=paste0("There are ", K ," clusters detected total. However, ", totSmall, " clusters have fewer
       than < 10 cells. Please examine the data for outliers or try setting K manually."),
                   K=K, Clusters=c_cl, ifConnected=NA))
     }
@@ -79,7 +79,7 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 #' @param max.nc The maximum number of clusters used in NbClust. The default number is 5.
 #' @param K The number of clusters if you have prior information. If left NULL, the number of clusters is estimated by NbClust.
 #' @param checkcells The number of cells examined per cluster determines the identification of connected clusters. If left NULL, the default value is calculated as the maximum value of the minimum cluster size divided by 5 and 10.
-#' @param connectedCells The minimum number of connected cells between clusters used to identify their connection. If left NULL, the default value is 10.
+#' @param connectedCells The minimum number of connected cells between clusters used to identify their connection. The default value is 1. If left NULL, the default value is 10.
 #' @param checksize The number of neighbors to consider for each check cell to determine their connectivity. If left NULL, the value is set to be equal to "checkcells".
 #'
 #' @import stats
@@ -90,7 +90,7 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 
 LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
                                max.nc=5, K=NULL, checkcells=NULL,
-                               connectedCells=NULL, checksize=NULL) {
+                               connectedCells=1, checksize=NULL) {
 
   if(is.null(K)) {
     res.nbclust <- Escort::NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
@@ -234,7 +234,7 @@ BWClusters_Determination <- function(dist_mat, K, c_cl, cutoff=0.3, checkcells=N
   }
 
   DCdecision <- ifelse(check,"Congratulations! Escort did not find null spaces between clusters. Proceed to the homogeneity check step next.",
-                       "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further 
+                       "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further
                        investigation. Please see the vignette for recommendations. ")
 
   return(list(DCcheck=DCdecision, ifConnected=check, Jaccardsummary=combnt,

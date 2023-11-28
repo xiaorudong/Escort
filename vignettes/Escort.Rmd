@@ -114,7 +114,7 @@ We evaluate cell connectivity on the lower dimensional embedding using the `LD_D
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 dist_mat <- dist(dimred, method = "euclidean")
-DRLvsC <- LD_DCClusterscheck(dist_mat=dist_mat, DRdims=dimred, connectedCells = 1)
+DRLvsC <- LD_DCClusterscheck(dist_mat=dist_mat, DRdims=dimred)
 DRLvsC$DCcheck
 ```
 
