@@ -7,7 +7,7 @@
 #' @return a dataframe with scores for each embedding.
 #' @export
 
-score_cal <- function(scoredf, SimiRetaincutoff=0, GOFcutoff=0.53, URATEcutoff=0.029) {
+calcScore <- function(scoredf, SimiRetaincutoff=0, GOFcutoff=0.53, URATEcutoff=0.029) {
   if (all(is.na(scoredf))) {
     final_scoredf <- scoredf
     final_scoredf$score <- rep(NA, nrow(final_scoredf))

@@ -52,12 +52,11 @@ DE_seurat <- function(rawcounts, cls) {
 #'
 #' @import clusterProfiler
 #' @import dplyr
-#' @import scran
 #' @export
 
 HVGs_GO <- function(norm_counts, OrgDb="org.Hs.eg.db") {
-  gene.var <- modelGeneVar(norm_counts)
-  HVGs <- getTopHVGs(gene.var, fdr.threshold=0.05)
+  gene.var <- quick_model_gene_var(norm_counts)
+  HVGs <- rownames(subset(gene.var, FDR < 0.05))
 
   ego <- enrichGO(gene = HVGs, OrgDb = OrgDb, ont = "ALL", keyType = "GENENAME")
   if (is.null(ego)) {
@@ -82,21 +81,19 @@ HVGs_GO <- function(norm_counts, OrgDb="org.Hs.eg.db") {
 
 
 
-#' Find HVGs by using scran package
+#' Find HVGs by using quick scran
 #'
 #' @param norm_counts A normalized count data matrix: row:genes, column:cells
 #'
 #' @import dplyr
-#' @import scran
 #' @export
 
-HVGs_scran <- function(norm_counts) {
-  gene.var <- modelGeneVar(norm_counts)
+HVGs_quick <- function(norm_counts) {
+  gene.var <- quick_model_gene_var(norm_counts)
 
   df <- as.data.frame(gene.var) %>%
     mutate(across(1:6, round, 3)) %>%
     mutate(across(5:6, function(x) ifelse(x<0.001, "<0.0005", x)))
 
-  # HVGs <- getTopHVGs(gene.var, fdr.threshold=0.05)
   return(df)
 }

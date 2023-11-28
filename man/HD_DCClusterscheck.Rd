@@ -12,8 +12,7 @@ HD_DCClusterscheck(
   cutoff = 0.3,
   checkcells = NULL,
   connectedCells = NULL,
-  checksize = NULL,
-  seed = 1111
+  checksize = NULL
 )
 }
 \arguments{

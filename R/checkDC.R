@@ -21,41 +21,45 @@
 HD_DCClusterscheck <- function(dist_mat, rawcounts,
                                K=NULL, clust.max=10,
                                cutoff=0.3, checkcells=NULL,
-                               connectedCells=NULL, checksize=NULL, seed=1111) {
+                               connectedCells=NULL, checksize=NULL) {
 
-  set.seed(seed)
-  if(is.null(K)) {
+
+  if (is.null(K)) {
     # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
-    myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)
-    c_cl <- myclust.res[[1]]
-    names(c_cl) <- colnames(rawcounts)
-    K <- max(c_cl)
-  } else {
-    # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
-    # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7444317/
-    # create a SingleCellExperiment object
-    sce <- SingleCellExperiment::SingleCellExperiment(
-      assays = list(
-        counts = as.matrix(rawcounts),
-        logcounts = log2(rawcounts + 1)))
-
-    # define feature names in feature_symbol column
-    rowData(sce)$feature_symbol <- rownames(sce)
-    res <- SC3::sc3(sce, ks = K, biology = TRUE)
-    c_cl_raw <- SingleCellExperiment::colData(res)[,1]
-    c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
-    names(c_cl) <- rownames(SingleCellExperiment::colData(res))
-    K <- max(c_cl)
-  }
+    myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)[[1]]
+    names(myclust.res) <- colnames(rawcounts)
+    K <- max(myclust.res)
+  } 
+  
+  # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
+	# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7444317/
+	# create a SingleCellExperiment object
+	sce <- SingleCellExperiment::SingleCellExperiment(
+          	  assays = list(
+          	    counts = as.matrix(rawcounts),
+          	    logcounts = log2(rawcounts + 1)), 
+          	  rowData = data.frame(feature_symbol = rownames(rawcounts))
+          	  )
 
 
-  if(K==1) {
-    DCdecision <- "We only detect one cluster. Please do it again"
+	res <- SC3::sc3(sce, ks = K, biology = TRUE)
+	c_cl_raw <- SingleCellExperiment::colData(res)[,1]
+	c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
+	names(c_cl) <- rownames(SingleCellExperiment::colData(res))
+  
+  K <- max(c_cl)
+  
+
+
+  if (K==1) {
+    DCdecision <- "Only one cluster detected. Cells are likely connected, proceed to the homogeneity check step next."
     return(list(DCcheck=DCdecision, K=K, Clusters=c_cl, ifConnected=NA))
   }
   if (K>1) {
     if (any(table(c_cl)<=10)) {
-      return(list(DCcheck="There are small clusters deteced. Please do clustering again",
+      totSmall <- sum(table(c_cl)  <= 10)
+      return(list(DCcheck=paste0("There are ", K ," clusters detected total. However, ", totSmall, " clusters have fewer 
+      than < 10 cells. Please examine the data for outliers or try setting K manually."),
                   K=K, Clusters=c_cl, ifConnected=NA))
     }
     if (any(table(c_cl)>10)) {
@@ -92,11 +96,9 @@ LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
     res.nbclust <- Escort::NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
     K <- length(unique(res.nbclust$Best.partition))
     c_cl <- res.nbclust$Best.partition
-    # names(c_cl) <- rownames(DRdims)
   } else {
     res.hc <- hclust(dist_mat, method = "complete")
     c_cl <- cutree(res.hc, k = K)
-    # names(c_cl) <- rownames(DRdims)
   }
   if (any(table(c_cl)<=5)) {
     return(list(DCcheck="There are small clusters deteced. Please do clustering again",
@@ -231,8 +233,9 @@ BWClusters_Determination <- function(dist_mat, K, c_cl, cutoff=0.3, checkcells=N
     check <- check1 & check2 & check4
   }
 
-  DCdecision <- ifelse(check,"Congratulations! We didn't find null spaces between clusters. Go ahead doing trajectory anlaysis.",
-                       "There are null spaces between clusters. We don't recommend doing trajectory analysis on this dataset")
+  DCdecision <- ifelse(check,"Congratulations! Escort did not find null spaces between clusters. Proceed to the homogeneity check step next.",
+                       "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further 
+                       investigation. Please see the vignette for recommendations. ")
 
   return(list(DCcheck=DCdecision, ifConnected=check, Jaccardsummary=combnt,
               clusterLocation=check_mat, K=K, Clusters=c_cl,

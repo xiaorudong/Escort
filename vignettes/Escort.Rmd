@@ -4,8 +4,10 @@ author: "Xiaoru Dong"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Escort}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -26,9 +28,34 @@ set.seed(11111)
 
 `Escort` is an R package designed to assist users in detecting trajectories, evaluating and ranking various analysis choices. It follows a three-step approach, guiding users through the analysis process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis choices. This encompasses features like feature selection, dimension reduction, and trajectory inference methods, along with their respective hyperparameters.
 
+# Installation
 
-# Run Escort
-After successful installation, `Escort` and related packages need be loaded into the working space:
+```{r, results='hide', message=FALSE, warning=FALSE, eval=FALSE}
+if (!requireNamespace("devtools", quietly=TRUE))
+    install.packages("devtools")
+devtools::install_github("xiaorudong/Escort")
+```
+
+Dependencies:
+
+Bioconductor: clusterProfiler
+
+CRAN:
+
+Bioconductor packages can be installed using: 
+
+```{r, results='hide', message=FALSE, warning=FALSE, eval=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("PACKAGE NAME")
+```
+
+CRAN packages can be installed using:
+
+```{r, results='hide', message=FALSE, warning=FALSE, eval=FALSE}
+install.packages("PACKAGE NAME")
+```
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 library(Escort)
@@ -37,12 +64,13 @@ library(cluster)
 library(mclust)
 library(RMTstat)
 ```
+
 ### Example data for single-cell data
 
 Below we show an example using a simulated single-cell RNA-seq dataset from Saelens et al., 2019, accessible at (https://zenodo.org/records/1443566). This simulated scRNA-seq dataset is characterized by a linear topology structure. After cleaning the dataset, we use the normalized and raw data sets to do following anlaysis.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-load("data/step0_clean_dyntoy_L3.RData")
+data("step0_clean_dyntoy_L3")
 ```
 
 Escort employs a three-step approach to guide users through the analysis by detecting the presence of trajectories and then offering goodness-of-fit evaluations for both embeddings and trajectories. Embeddings are classified into two categories: recommended and non-recommended. Recommended embeddings indicate a better fit to the data and consequently, a better estimated trajectory.
@@ -52,15 +80,16 @@ Escort employs a three-step approach to guide users through the analysis by dete
 We identified two scenarios where trajectory fitting is not appropriate: when cells represent diverse cell types or when cells are homogeneous. The input in the step 1 is matrixes of raw and normalized single-cell RNA-seq data after quality control. The `HD_DCClusterscheck()` function is utilized to identify diverse cell types, while the `testHomogeneous()` function aids in assessing homogeneity.
 
 ### Identifing distinct cell types
+
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 dist_mat <- parallelDist::parDist(t(norm_counts), method = "manhattan")
-LvsC <- HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=rawcounts)
+LvsC <- HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=rawcounts, K=2)
 LvsC$DCcheck
 ```
 
 ### Assessing the homogeneity 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-cor_test <- testHomogeneous(norm_counts=norm_counts)
+cor_test <- step1_testHomogeneous(norm_counts=norm_counts, num.sim=5)
 cor_test$decision
 ```
 
@@ -70,9 +99,10 @@ The second step is designed to identify preferred embeddings for performing traj
 For feature selection, we could select any number of highly variable genes. Escort provides well-known dimension reduction algorithms for generating embeddings, such as UMAP, t-SNE, MDS, and PCA through the `getDR_2D()` function. For example, we apply the PCA algorithm, utilizing the top 20% of highly variable genes for the dimension reduction process. The `modelGeneVar()` function from `scarn` package is employed here to identify highly variable genes.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-library(scran)
-gene.var <- modelGeneVar(norm_counts)
-genes.HVGs <- getTopHVGs(gene.var, prop=0.2)
+
+gene.var <- quick_model_gene_var(norm_counts)
+genes.HVGs <- rownames(gene.var)[1:1000] # top 1000 genes (approx. 20%)
+
 dimred <- getDR_2D(norm_counts[genes.HVGs,], "PCA")
 head(dimred)
 ```
@@ -87,6 +117,7 @@ dist_mat <- dist(dimred, method = "euclidean")
 DRLvsC <- LD_DCClusterscheck(dist_mat=dist_mat, DRdims=dimred, connectedCells = 1)
 DRLvsC$DCcheck
 ```
+
 ### Examining preservation of cell relationships
 
 We assess the effectiveness of low-dimensional embeddings in preserving inter-cellular relationships identified in the high-dimensional data by `Similaritycheck()` function. The percentage represents the rate at which cells in the low-dimensional embedding successfully maintain inter-cellular relationships. A higher percentage indicates a greater preservation of relationships among cells.
@@ -151,7 +182,7 @@ In the final step, a comprehensive score is computed to assess the overall perfo
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 scoredf <- data.frame(DCcheck=DRLvsC$ifConnected, SimiRetain=simi_cells$GoodRate,
                       GOF=gof_eval$occupiedRate, USHAPE=ushap_eval$Ambpct)
-score_cal(scoredf)
+calcScore(scoredf)
 ```
 
 

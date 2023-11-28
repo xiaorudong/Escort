@@ -7,7 +7,6 @@
 #' @import Seurat
 #' @import shiny
 #' @import shinyWidgets
-#' @import scran
 #' @import mclust
 #' @import slingshot
 #' @importFrom scales alpha

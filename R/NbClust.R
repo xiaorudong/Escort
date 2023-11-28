@@ -1,4 +1,6 @@
 # paste from NbClust() function from NbClus package
+#' @export
+
 NbClust <- function (data = NULL, diss = NULL, distance = "euclidean",
           min.nc = 2, max.nc = 15, method = NULL, index = "all", alphaBeale = 0.1)
 {

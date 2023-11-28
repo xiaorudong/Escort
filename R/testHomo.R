@@ -1,14 +1,13 @@
 #' Test Homogeneous
 #'
-#' @param HVGs Highly variable genes. If there is no input of the highly variable genes, they will be calcualted by `modelGeneVar()` function.
 #' @param norm_counts A normalized count data matrix: row:genes, column:cells
-#' @param n The number of highly variable genes to test
-#' @param num.sim The number of simulations generated for permutation test on spearman correlation
+#' @param HVGs Highly variable genes. If there is no input of the highly variable genes, they will be calcualted by `modelGeneVar()` function.
+#' @param g The number of highly variable genes to test
+#' @param num.sim The number of simulations generated for permutation test on spearman correlation. Default is 20000. Reduce this to improve speed.
 #'
 #' @importFrom jmuOutlier perm.cor.test
 #' @import stats
 #' @import S4Vectors
-#' @import scran
 #'
 #' @return A list about the results of trajectory signal detection
 #' \itemize{
@@ -17,14 +16,12 @@
 #' }
 #' @export
 
-testHomogeneous <- function(HVGs=NULL, norm_counts, n=100, num.sim = 20000, seed=1111) {
+step1_testHomogeneous <- function(norm_counts, HVGs=NULL, g=100, num.sim = 20000) {
   if(is.null(HVGs)) {
-    gene.var <- scran::modelGeneVar(norm_counts)
-    HVGs <- scran::getTopHVGs(gene.var)
+    gene.var <- quick_model_gene_var(norm_counts)
+    HVGs <- rownames(gene.var)[1:g]
   }
   if(length(HVGs)<20) return("Please input more highly variable genes.")
-
-  set.seed(seed)
 
   pcDat <- prcomp(t(norm_counts))
   pca_cells <- pcDat$x
@@ -33,7 +30,7 @@ testHomogeneous <- function(HVGs=NULL, norm_counts, n=100, num.sim = 20000, seed
   time_df <- data.frame(Cell=names(est_pt), PT=est_pt)
   time_df$Cell <- factor(time_df$Cell, levels=colnames(norm_counts))
   time_df <- time_df[order(time_df$Cell),]
-  comb_df <- cbind(time_df, t(norm_counts[head(HVGs, n),]))
+  comb_df <- cbind(time_df, t(norm_counts[HVGs,]))
   comb_df <- comb_df[order(comb_df$PT),]
 
   p_vec_perm <- apply(comb_df[,3:ncol(comb_df)], 2,

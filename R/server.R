@@ -152,7 +152,7 @@ server <- function(input, output) {
   step1_hvgs <- reactive({
     if(step1_test1()$signal_pct<0.46) {
       norm_mat <- mydf$norm
-      df <- Escort::HVGs_scran(norm_counts=norm_mat)
+      df <- Escort::HVGs_quick(norm_counts=norm_mat)
       return(df)
     }
   })
@@ -244,8 +244,8 @@ server <- function(input, output) {
     if(is.null(input$normfile)) return(NULL)
     if(!mydf$from) return(NULL)
     # select genes:
-    gene.var <- scran::modelGeneVar(x=mydf$norm)
-    genes.HVGs <- scran::getTopHVGs(stats=gene.var, n=input$checkgenes)
+    gene.var <- quick_model_gene_var(mydf$norm)
+    genes.HVGs <- rownames(gene.var)[1:input$checkgenes]
     sub_counts <- mydf$norm[genes.HVGs,]
     # DR
     dimred <- getDR_2D(sub_counts, input$checkDR)
