@@ -101,7 +101,7 @@ server <- function(input, output) {
     norm_mat <- mydf$norm
     raw_mat <- mydf$raw
     dist_mat <- parDist(t(norm_mat), method = "manhattan")
-    HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=raw_mat)
+    HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=raw_mat, clust.max = 5)
   })
 
   output$step1_dc <- renderText({
@@ -136,7 +136,7 @@ server <- function(input, output) {
   step1_test1 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
-    testHomogeneous(norm_counts=norm_mat, num.sim = 1000)
+    step1_testHomogeneous(norm_counts=norm_mat, num.sim = 1000)
   })
 
   output$step1_homogeneous <- renderText({
@@ -427,7 +427,7 @@ server <- function(input, output) {
     if(is.null(final_tb())) return(NULL)
     if(is.null(step1_res())) return(NULL)
     scoredf <- final_tb()
-    final_df <- score_cal(scoredf)
+    final_df <- calcScore(scoredf)
     return(final_df)
   })
 

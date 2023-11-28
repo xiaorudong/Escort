@@ -37,12 +37,12 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 	sce <- SingleCellExperiment::SingleCellExperiment(
           	  assays = list(
           	    counts = as.matrix(rawcounts),
-          	    logcounts = log2(rawcounts + 1)),
+          	    logcounts = as.matrix(log2(rawcounts + 1))),
           	  rowData = data.frame(feature_symbol = rownames(rawcounts))
           	  )
 
 
-	res <- SC3::sc3(sce, ks = K, biology = TRUE)
+	res <- SC3::sc3(sce, ks = K)
 	c_cl_raw <- SingleCellExperiment::colData(res)[,1]
 	c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
 	names(c_cl) <- rownames(SingleCellExperiment::colData(res))
