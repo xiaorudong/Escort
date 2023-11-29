@@ -11,7 +11,7 @@ LD_DCClusterscheck(
   max.nc = 5,
   K = NULL,
   checkcells = NULL,
-  connectedCells = NULL,
+  connectedCells = 1,
   checksize = NULL
 )
 }
@@ -28,7 +28,7 @@ LD_DCClusterscheck(
 
 \item{checkcells}{The number of cells examined per cluster determines the identification of connected clusters. If left NULL, the default value is calculated as the maximum value of the minimum cluster size divided by 5 and 10.}
 
-\item{connectedCells}{The minimum number of connected cells between clusters used to identify their connection. If left NULL, the default value is 10.}
+\item{connectedCells}{The minimum number of connected cells between clusters used to identify their connection. The default value is 1. If left NULL, the default value is 10.}
 
 \item{checksize}{The number of neighbors to consider for each check cell to determine their connectivity. If left NULL, the value is set to be equal to "checkcells".}
 }

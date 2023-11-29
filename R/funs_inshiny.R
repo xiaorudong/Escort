@@ -4,41 +4,40 @@
 #' @param rawcounts A raw count data matrix: row:genes, column:cells
 #' @param cls Identified disconnected clusters
 #'
-#' @import Seurat
+#' @import limma
+#' @import edgeR
 #' @import dplyr
 #' @export
 
-DE_seurat <- function(rawcounts, cls) {
+DE_limma <- function(rawcounts, cls) {
 
   a <- match(colnames(rawcounts), names(cls))
-  cls <- cls[a]
-
+  cls <- paste("Cluster", cls[a], sep = "")
   clusters <- as.factor(cls)
+  combn_tb <- t(combn(levels(clusters), 2))
 
-  scdata <- CreateSeuratObject(counts = rawcounts)
-  scdata <- NormalizeData(scdata)
-  scdata <- AddMetaData(scdata, metadata=clusters, col.name = "myclusters")
-  Idents(scdata) <- scdata$myclusters
-
+  d <- DGEList(rawcounts)
+  d <- calcNormFactors(d)
+  mm <- model.matrix(~0+clusters)
+  colnames(mm) <- gsub("clusters", "", colnames(mm))
+  y <- voom(d, mm)
+  fit <- lmFit(y, mm)
+  comp <- apply(combn_tb, 1, function(x) paste(x,collapse = "-"))
+  contr <- makeContrasts(contrasts=comp, levels=mm)
+  fit <- contrasts.fit(fit, contr)
+  res <- eBayes(fit)
   de_ls <- list()
-  if(length(unique(cls))==2) {
-    de.markers <- FindMarkers(scdata, ident.1 = unique(cls)[1])
-    de.markers_sig <- de.markers[de.markers$p_val_adj<0.05, ]
-    de.markers_sig$comp <- rep(paste(unique(cls)[1], unique(cls)[2], sep = " vs "), nrow(de.markers_sig))
-    de_ls[[unique(cls)[1]]] <- as.data.frame(de.markers_sig)
+  for (i in 1:ncol(fit$coefficients)) {
+    top.table <- topTable(res, adjust="BH",coef=1, p.value=0.05, n=Inf)
+    top.table <- as.data.frame(top.table)
+    top.table$Comp <- colnames(fit$coefficients)[i]
+    de_ls[[i]] <- top.table[, c("AveExpr", "logFC", "P.Value", "adj.P.Val", "Comp")]
   }
-  if(length(unique(cls))>2) {
-    for (cl_i in unique(cls)) {
-      de.markers <- FindMarkers(scdata, ident.1 = cl_i)
-      de.markers_sig <- de.markers[de.markers$p_val_adj<0.05, ]
-      de.markers_sig$comp <- rep(paste(cl_i, "others", sep = " vs "), nrow(de.markers_sig))
-      de_ls[[cl_i]] <- as.data.frame(de.markers_sig)
-    }
-  }
+
   de_df <- do.call("rbind", de_ls)
   de_df <- de_df %>%
-    mutate(across(1:5, round, 3)) %>%
-    mutate(across(1:5, function(x) ifelse(x<0.001, "<0.0005", x)))
+    mutate(across(1:4, round, 3)) %>%
+    mutate(across(1:4, function(x) ifelse(x<0.001, "<0.0005", x)))
 
   return(de_df)
 }
