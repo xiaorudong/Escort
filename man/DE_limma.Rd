@@ -2,7 +2,7 @@
 % Please edit documentation in R/funs_inshiny.R
 \name{DE_limma}
 \alias{DE_limma}
-\title{Find DE genes between disconnected clusters}
+\title{Find top 30 DE genes between disconnected clusters}
 \usage{
 DE_limma(rawcounts, cls)
 }
@@ -12,5 +12,5 @@ DE_limma(rawcounts, cls)
 \item{cls}{Identified disconnected clusters}
 }
 \description{
-Find DE genes between disconnected clusters
+Find top 30 DE genes between disconnected clusters
 }

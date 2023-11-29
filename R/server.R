@@ -128,7 +128,7 @@ server <- function(input, output) {
     if(!mydf$from) return(NULL)
     if(is.null(step1_test2())) return(NULL)
     if(step1_test2()$ifConnected) return(NULL)
-    datatable(step1_de(),rownames = TRUE, filter = 'top')%>%
+    datatable(step1_de(),rownames = F, filter = 'top')%>%
       DT::formatStyle(names(step1_de()),lineHeight='80%')
   })
 

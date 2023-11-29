@@ -1,5 +1,5 @@
 
-#' Find DE genes between disconnected clusters
+#' Find top 30 DE genes between disconnected clusters
 #'
 #' @param rawcounts A raw count data matrix: row:genes, column:cells
 #' @param cls Identified disconnected clusters
@@ -28,16 +28,18 @@ DE_limma <- function(rawcounts, cls) {
   res <- eBayes(fit)
   de_ls <- list()
   for (i in 1:ncol(fit$coefficients)) {
-    top.table <- topTable(res, adjust="BH",coef=1, p.value=0.05, n=Inf)
+    top.table <- topTable(res, adjust="BH",coef=i, n=30)
     top.table <- as.data.frame(top.table)
-    top.table$Comp <- colnames(fit$coefficients)[i]
-    de_ls[[i]] <- top.table[, c("AveExpr", "logFC", "P.Value", "adj.P.Val", "Comp")]
+    top.table$Comp <- gsub("-", " vs ", colnames(fit$coefficients)[i])
+    top.table$Gene <- rownames(top.table)
+    rownames(top.table) <- NULL
+    de_ls[[i]] <- top.table[, c("Gene","AveExpr", "logFC", "P.Value", "adj.P.Val", "Comp")]
   }
 
   de_df <- do.call("rbind", de_ls)
   de_df <- de_df %>%
-    mutate(across(1:4, round, 3)) %>%
-    mutate(across(1:4, function(x) ifelse(x<0.001, "<0.0005", x)))
+    mutate(across(2:5, round, 3)) %>%
+    mutate(across(2:5, function(x) ifelse(x<0.001, "<0.0005", x)))
 
   return(de_df)
 }
