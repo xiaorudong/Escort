@@ -4,7 +4,7 @@ library(parallelDist) # for fast calculation of the distance matrix.
 library(cluster)
 library(mclust)
 library(RMTstat)
-library(scran)
+
 
 
 # setwd("/Users/ruby/Desktop/Graduate/Research/Escort/")

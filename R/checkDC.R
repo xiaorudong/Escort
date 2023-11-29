@@ -26,28 +26,29 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 
   if (is.null(K)) {
     # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
-    myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)[[1]]
-    names(myclust.res) <- colnames(rawcounts)
-    K <- max(myclust.res)
+    myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)
+    c_cl <- myclust.res[[1]]
+    names(c_cl) <- colnames(rawcounts)
+    K <- max(c_cl)
+  } else {
+
+    # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
+    # https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7444317/
+    # create a SingleCellExperiment object
+    sce <- SingleCellExperiment::SingleCellExperiment(
+      assays = list(
+        counts = as.matrix(rawcounts),
+        logcounts = as.matrix(log2(rawcounts + 1))),
+      rowData = data.frame(feature_symbol = rownames(rawcounts))
+    )
+
+
+    res <- SC3::sc3(sce, ks = K)
+    c_cl_raw <- SingleCellExperiment::colData(res)[,1]
+    c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
+    names(c_cl) <- rownames(SingleCellExperiment::colData(res))
+    K <- max(c_cl)
   }
-
-  # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
-	# https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7444317/
-	# create a SingleCellExperiment object
-	sce <- SingleCellExperiment::SingleCellExperiment(
-          	  assays = list(
-          	    counts = as.matrix(rawcounts),
-          	    logcounts = as.matrix(log2(rawcounts + 1))),
-          	  rowData = data.frame(feature_symbol = rownames(rawcounts))
-          	  )
-
-
-	res <- SC3::sc3(sce, ks = K)
-	c_cl_raw <- SingleCellExperiment::colData(res)[,1]
-	c_cl <- as.numeric(factor(c_cl_raw, levels = sort(unique(c_cl_raw))))
-	names(c_cl) <- rownames(SingleCellExperiment::colData(res))
-
-  K <- max(c_cl)
 
 
 
@@ -58,8 +59,8 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
   if (K>1) {
     if (any(table(c_cl)<=10)) {
       totSmall <- sum(table(c_cl)  <= 10)
-      return(list(DCcheck=paste0("There are ", K ," clusters detected total. However, ", totSmall, " clusters have fewer
-      than < 10 cells. Please examine the data for outliers or try setting K manually."),
+      return(list(DCcheck=paste0("There are ", K ," clusters detected total. However, ", totSmall,
+      " clusters have fewer than < 10 cells. Please examine the data for outliers or try setting K manually."),
                   K=K, Clusters=c_cl, ifConnected=NA))
     }
     if (any(table(c_cl)>10)) {
@@ -234,8 +235,7 @@ BWClusters_Determination <- function(dist_mat, K, c_cl, cutoff=0.3, checkcells=N
   }
 
   DCdecision <- ifelse(check,"Congratulations! Escort did not find null spaces between clusters. Proceed to the homogeneity check step next.",
-                       "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further
-                       investigation. Please see the vignette for recommendations. ")
+                       "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further investigation. Please see the vignette for recommendations.")
 
   return(list(DCcheck=DCdecision, ifConnected=check, Jaccardsummary=combnt,
               clusterLocation=check_mat, K=K, Clusters=c_cl,
