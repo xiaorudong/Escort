@@ -5,7 +5,8 @@
 #'
 #' @return This starts up the shiny app interface for Escort.
 #' @import Seurat
-#' @import shiny
+#' @import limma
+#' @import edgeR
 #' @import shinyWidgets
 #' @import mclust
 #' @import slingshot
