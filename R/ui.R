@@ -61,7 +61,7 @@ ui <- dashboardPage(
                        "Escort is a framework that uses data to evaluate
                        how well different methods can infer trajectories
                        from single-cell data. It employs a three-step approach to guide users
-                       through the analysis by providing goodness-of-fit (GOF) evaluations of embeddings
+                       through the analysis by providing evaluations of embeddings
                        representing a series of analysis choices including feature selection,
                        dimension reduction, and trajectory inference methods.",
                        br(),
