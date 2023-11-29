@@ -4,7 +4,6 @@
 #' Runs the Escort Shiny app.
 #'
 #' @return This starts up the shiny app interface for Escort.
-#' @import limma
 #' @import edgeR
 #' @import shinyWidgets
 #' @import mclust

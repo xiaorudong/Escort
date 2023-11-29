@@ -4,36 +4,40 @@
 #' @param rawcounts A raw count data matrix: row:genes, column:cells
 #' @param cls Identified disconnected clusters
 #'
-#' @import limma
 #' @import edgeR
 #' @import dplyr
 #' @export
 
-DE_limma <- function(rawcounts, cls) {
+DE_edgeR <- function(rawcounts, cls) {
 
   a <- match(colnames(rawcounts), names(cls))
-  cls <- paste("Cluster", cls[a], sep = "")
-  clusters <- as.factor(cls)
-  combn_tb <- t(combn(levels(clusters), 2))
+  cls <- cls[a]
+  meta <- data.frame(cell=names(cls), clusternum=cls)
+  meta$cluster <- factor(paste("Cluster", meta$clusternum, sep = ""))
+  mm <- model.matrix(~0+cluster, data=meta)
+  colnames(mm) <- gsub("cluster", "", colnames(mm))
+
+  combn_tb <- t(combn(levels(meta$cluster), 2))
+  comp <- apply(combn_tb, 1, function(x) paste(x,collapse = "-"))
+  contr <- makeContrasts(contrasts=comp, levels=mm)
 
   d <- DGEList(rawcounts)
   d <- calcNormFactors(d)
-  mm <- model.matrix(~0+clusters)
-  colnames(mm) <- gsub("clusters", "", colnames(mm))
-  y <- voom(d, mm)
-  fit <- lmFit(y, mm)
-  comp <- apply(combn_tb, 1, function(x) paste(x,collapse = "-"))
-  contr <- makeContrasts(contrasts=comp, levels=mm)
-  fit <- contrasts.fit(fit, contr)
-  res <- eBayes(fit)
+  d <- estimateDisp(d, mm)
+  fit <- glmFit(d, mm)
+
   de_ls <- list()
-  for (i in 1:ncol(fit$coefficients)) {
-    top.table <- topTable(res, adjust="BH",coef=i, n=30)
+  for (i in 1:ncol(contr)) {
+    lrt <- glmLRT(fit, contrast = contr[,i])
+    top.table <- topTags(lrt, adjust.method = "BH", n = 30)
     top.table <- as.data.frame(top.table)
-    top.table$Comp <- gsub("-", " vs ", colnames(fit$coefficients)[i])
+    colnames(top.table)[which(colnames(top.table)=="PValue")] <- "p"
+    colnames(top.table)[which(colnames(top.table)=="FDR")] <- "adj.p"
     top.table$Gene <- rownames(top.table)
+    top.table$Comp <- gsub("-", " vs ", colnames(contr)[i])
+
     rownames(top.table) <- NULL
-    de_ls[[i]] <- top.table[, c("Gene","AveExpr", "logFC", "P.Value", "adj.P.Val", "Comp")]
+    de_ls[[i]] <- top.table[, c("Gene","logCPM", "logFC", "p", "adj.p", "Comp")]
   }
 
   de_df <- do.call("rbind", de_ls)

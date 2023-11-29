@@ -7,7 +7,6 @@ library(RColorBrewer)
 library(shinyjs)
 library(dplyr)
 library(clusterProfiler)
-library(limma)
 library(edgeR)
 
 
@@ -119,7 +118,7 @@ server <- function(input, output) {
     if(!step1_test2()$ifConnected) {
       raw_mat <- mydf$raw
       cls <- step1_test2()$Clusters
-      df <- Escort::DE_limma(rawcounts=raw_mat, cls=cls)
+      df <- Escort::DE_edgeR(rawcounts=raw_mat, cls=cls)
       return(df)
     }
   })
