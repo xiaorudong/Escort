@@ -7,19 +7,40 @@ Discover how shinyEscort operates on the "About" tab positioned within the left 
 
 
 ### Step1
-To initiate the analysis assessing the data's support for trajectory existence, users can click on the "Step 1" button in the left column sidebar. The user inputs cleaned raw and normalized single-cell RNA-seq data in preformatted CSV files and then click “Import” button. Example datasets for practice are available in the data directory, encompassing simulated datasets showcasing various scRNA data scenarios, including homogeneous data, datasets with distinct cluster types, and linear topology datasets. Escort checks if the datasets share the same dimensions and showing the number of genes and cells in the dataset; if qualified, it proceeds to assess trajectory feasibility. 
-<br/>
-<br/>
-Two scenarios deemed inappropriate for trajectory fitting include cells from biologically distinct clusters and sets of cells with insufficient heterogeneity. The outcomes are displayed in boxes on the left, while UMAP and t-SNE representations visualize the datasets on the right. If the dataset fails the evaluation, such as detecting distinct clusters, differential expression analysis ensues via the edgeR R package, identifying the top 30 differentially expressed genes between pairwise clusters. Additionally, for datasets demonstrating homogeneity, a compilation of highly variable genes is presented, followed by Gene Ontology (GO) enrichment analysis for a comprehension of biological processes.
+#### Input:
+To initiate the analysis assessing the data's support for trajectory existence, users can click on the "Step 1" button in the left column sidebar. The user inputs cleaned raw and normalized single-cell RNA-seq data in preformatted CSV files and then click “Import” button. For hands-on practice, example datasets are stored in the data directory, featuring simulated scenarios such as homogeneous data, datasets with distinct cluster types, and linear topology datasets. In this demonstration, we utilize "rawcount_linear_splatter.csv" and "normcount_linear_splatter.csv" as illustrative examples, showcasing simulated scRNA-seq data with a linear structure in the screenshot.
+#### Output:
+**The number of cells and genes** <br/>
+Escort systematically checks the compatibility of normalized and raw datasets, ensuring they originate from the same dataset by assessing if they share identical dimensions. If they belong to the same dataset, the number of genes and cells within it is displayed, paving the way for the assessment of trajectory existence. In cases where the datasets do not align or if there is any missing input data, "NA" is displayed in the number of genes and cells.<br/>
+**UMAP and t-SNE representations** <br/>
+On the right side, UMAP and t-SNE representations provide a visual insight into the datasets. <br/>
+**Existence of trajectory** <br/>
+Two scenarios deemed inappropriate for trajectory fitting include cells from biologically distinct clusters and sets of cells with insufficient heterogeneity. These outcomes are presented in result boxes labeled "Diverse cell types" and "Homogeneous cells." The determination of trajectory existence is displayed above the UMAP and t-SNE representations.
+* **Diverse cell types**
+In instances where the dataset fails the evaluation, detecting distinct clusters triggers a subsequent differential expression analysis utilizing the edgeR R package. This process identifies the top 30 differentially expressed genes between pairwise clusters.
+* **Homogenous cells**
+For datasets demonstrating homogeneity, a list of highly variable genes is presented in the "HVGs" subtab. This is followed by a Gene Ontology (GO) enrichment analysis, and the results are presented within the "GO" subtab, providing a understanding of biological processes.
+
 ![screen shot of step1](shiny_step1.png)
 
 
 ### Downstream Analysis
-Customize your dimension reduction by choosing techniques like UMAP, MDS, or TSNE. Specify the number of highly variable genes, and by default, Escort fits a trajectory using Slingshot. Visualize the embedding and trajectory on the left, and click "Download Trajectory" to save the embedding and trajectory information as an .rds file for further analysis.
+#### Input:
+Customize your dimension reduction by choosing techniques like UMAP, MDS, or TSNE. Specify the number of highly variable genes and input the number of clusters in the dataset based on prior knowledge. By default, Escort utilizes Slingshot for trajectory fitting.
+#### Output:
+**Visualization** <br/>
+Visualize the embedding and trajectory on the left.<br/>
+**Download .rds** <br/>
+Click "Download Trajectory", allowing you to save the embedding and trajectory information as an .rds file for further in-depth analysis.
+
 ![screen shot of dr](shiny_dr.png)
 
 ### Step2:
-Transition to Step 2, where users upload the .rds files generated in the downstream analysis. Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. 
+#### Input:
+Transition to Step 2, where users upload the .rds files generated in the downstream analysis. 
+#### Output:
+Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. 
+
 ![screen shot of step2](shiny_step2.png)
 
 ### Step3
