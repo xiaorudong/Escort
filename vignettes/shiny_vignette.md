@@ -37,7 +37,7 @@ Click "Download Trajectory", allowing you to save the embedding and trajectory i
 
 ### Step2:
 #### Input:
-Transition to Step 2, where users upload the .rds files generated in the downstream analysis. 
+Transition to Step 2, where users upload the .rds files generated in the "Downstream Analysis" step. In this demonstration, we upload four .rds files that were generated in the "Downstream Analysis" step, as shown in the accompanying screenshot.
 #### Output:
 Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. <br/>
 **Inter-cellular relationships** <br/>
