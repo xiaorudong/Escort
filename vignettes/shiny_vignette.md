@@ -50,12 +50,16 @@ Examine the distribution of cells in the embeddings. A higher value indicates a 
 ![screen shot of step2](shiny_step2.png)
 
 ### Step3
+#### Input:
+No manual input required; calculations are performed automatically once Step 2 begins.
 #### Output:
 Utilizing the embedding-specific trajectory, Escort estimates the proportion of cells with ambiguous projections along the trajectory, displaying the results in a table. A higher value indicates more ambiguous cells in the embeddings.
 ![screen shot of step3](shiny_step3.png)
 
 
 ### Conclusion
+#### Input:
+No manual input required; calculations are performed automatically once Step 2 begins.
 #### Output:
 **Evaluation Table** <br/>
 Based on the three-step evaluation, Escort establishes a realistic and standardized benchmark scoring system ranging from negative infinity to two. Higher scores indicate better performance. Embeddings with a score greater than zero are recommended, while those with a score less than or equal to zero are considered non-recommended. Users can easily identify optimal embedding choices for constructing a trajectory through this scoring system. The conclusive results, featuring embeddings and trajectories, are presented in a table sorted by score. <br/>
