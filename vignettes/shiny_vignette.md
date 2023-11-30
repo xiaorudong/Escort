@@ -1,22 +1,24 @@
 ### Introduction
-
+Welcome to shinyEscort, a user-friendly Shiny application designed to help researchers, even those without coding experience, in gaining deeper insights from their data. With shinyEscort, you can input your original data, normalized data, embeddings, and estimated trajectory, making it a valuable tool for understanding your data and obtaining accurate trajectory results.
 
 ### About
-The initial "About" tab provides an introduction to how Escort works. It serves to evaluate sets of analysis choices, including feature selection, dimension reduction, and trajectory inference methods, along with their hyperparameters.
+Discover how shinyEscort operates on the "About" tab positioned within the left column sidebar, offering insights into analysis choices such as feature selection, dimension reduction, and trajectory inference methods. 
 ![screen shot of the entry page](shiny_about.png)
 
 
 ### Step1
-To initiate the analysis assessing the data's support for trajectory existence, users can click on the "Step 1" button in the left column sidebar. The user inputs cleaned raw and normalized single-cell RNA-seq data in preformatted CSV files and then click “Import” button. Escort checks if the datasets share the same dimensions and showing the number of genes and cells in the dataset; if qualified, it proceeds to assess trajectory feasibility. Two scenarios deemed inappropriate for trajectory fitting include cells from biologically distinct clusters and sets of cells with insufficient heterogeneity. The outcomes are displayed in boxes on the left, while UMAP and t-SNE representations visualize the datasets on the right. If the dataset fails the evaluation, such as detecting distinct clusters, Escort conducts differential expression analysis using the edgeR R package to identify the top 30 differentially expressed genes between pairwise clusters. Additionally, if the dataset is deemed homogeneous, Escort lists highly variable genes and performs Gene Ontology (GO) enrichment analysis for better understanding biological processes.
+To initiate the analysis assessing the data's support for trajectory existence, users can click on the "Step 1" button in the left column sidebar. The user inputs cleaned raw and normalized single-cell RNA-seq data in preformatted CSV files and then click “Import” button. Escort checks if the datasets share the same dimensions and showing the number of genes and cells in the dataset; if qualified, it proceeds to assess trajectory feasibility. 
+
+Two scenarios deemed inappropriate for trajectory fitting include cells from biologically distinct clusters and sets of cells with insufficient heterogeneity. The outcomes are displayed in boxes on the left, while UMAP and t-SNE representations visualize the datasets on the right. If the dataset fails the evaluation, such as detecting distinct clusters, differential expression analysis ensues via the edgeR R package, identifying the top 30 differentially expressed genes between pairwise clusters. Additionally, for datasets demonstrating homogeneity, a compilation of highly variable genes is presented, followed by Gene Ontology (GO) enrichment analysis for a comprehension of biological processes.
 ![screen shot of step1](shiny_step1.png)
 
 
 ### Downstream Analysis
-Users can employ Escort for dimension reduction by selecting a technique (e.g., UMAP, MDS, TSNE) and specifying the number of highly variable genes. By default, Escort fits a trajectory using Slingshot. Users can visualize the embedding and trajectory on the left and download the embedding and trajectory information into a .rds file by clicking “Download Trajectory” button.
+Customize your dimension reduction by choosing techniques like UMAP, MDS, or TSNE. Specify the number of highly variable genes, and by default, Escort fits a trajectory using Slingshot. Visualize the embedding and trajectory on the left, and click "Download Trajectory" to save the embedding and trajectory information as an .rds file for further analysis.
 ![screen shot of dr](shiny_dr.png)
 
 ### Step2:
-In step 2, users upload the .rds files generated in the downstream analysis. Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. 
+Transition to Step 2, where users upload the .rds files generated in the downstream analysis. Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. 
 ![screen shot of step2](shiny_step2.png)
 
 ### Step3
