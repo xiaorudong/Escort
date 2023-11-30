@@ -8,7 +8,8 @@ Discover how shinyEscort operates on the "About" tab positioned within the left 
 
 ### Step1
 To initiate the analysis assessing the data's support for trajectory existence, users can click on the "Step 1" button in the left column sidebar. The user inputs cleaned raw and normalized single-cell RNA-seq data in preformatted CSV files and then click “Import” button. Escort checks if the datasets share the same dimensions and showing the number of genes and cells in the dataset; if qualified, it proceeds to assess trajectory feasibility. 
-
+<br/>
+<br/>
 Two scenarios deemed inappropriate for trajectory fitting include cells from biologically distinct clusters and sets of cells with insufficient heterogeneity. The outcomes are displayed in boxes on the left, while UMAP and t-SNE representations visualize the datasets on the right. If the dataset fails the evaluation, such as detecting distinct clusters, differential expression analysis ensues via the edgeR R package, identifying the top 30 differentially expressed genes between pairwise clusters. Additionally, for datasets demonstrating homogeneity, a compilation of highly variable genes is presented, followed by Gene Ontology (GO) enrichment analysis for a comprehension of biological processes.
 ![screen shot of step1](shiny_step1.png)
 
