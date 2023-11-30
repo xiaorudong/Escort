@@ -181,15 +181,18 @@ ui <- dashboardPage(
                 the inter-cellular relationships found in the high-dimensional data.
                 The accuracy of trajectory prediction is heavily dependent on the extent to
                 which these relationships are preserved in the embedding.
-                We will evaluate two characteristics of embeddings: ",br(),
-                         " - Assess how well low-dimensional embeddings preserve the inter-cellular relationships
-                in the high-dimensional data.",  br(),
-                         " - Determine the cell spread in embeddings."),
+                We will evaluate three characteristics of embeddings: ",br(),
+                         " - The retention of inter-cellular relationships that are present in the high-dimensional data",  br(),
+                         " - The preservation of similarity relationships in the low-dimensional embedding",  br(),
+                         " - Cell spread in embeddings"),
                        box(
-                         width=NULL, title = "Check the Inter-cellular Relationships", status = "warning",
-                         tableOutput(outputId  = "step2_structuretb")%>% withSpinner(color="#FAD02C")),
+                         width=NULL, title = "Inter-cellular Relationships", status = "warning",
+                         tableOutput(outputId  = "step2_celltb")%>% withSpinner(color="#FAD02C")),
                        box(
-                         width=NULL, title = "Determine the Cell Spread ", status = "warning",
+                         width=NULL, title = "Preservation of Similarity Relationships", status = "warning",
+                         tableOutput(outputId  = "step2_simitb")%>% withSpinner(color="#FAD02C")),
+                       box(
+                         width=NULL, title = "Cell Spread ", status = "warning",
                          tableOutput(outputId = "step2_spreadtb")%>% withSpinner(color="#FAD02C"))
                        ),
                 column(width=3,

@@ -340,18 +340,26 @@ server <- function(input, output) {
   structure_tb <- reactive({
     if(is.null(all_files)) return(NULL)
     if(is.null(step1_res())) return(NULL)
-    norm_mat <- all_files()[[1]]$Normcounts
+    # norm_mat <- all_files()[[1]]$Normcounts
     dc_tb <- data.frame(data=names(step2_test1()), DCcheck=sapply(step2_test1(), function(x) x$ifConnected))
     simi_tb <- data.frame(data=names(step2_test2()), SimiRetain=sapply(step2_test2(), function(x) x$GoodRate))
     merge(dc_tb, simi_tb, by="data")
   })
 
-  output$step2_structuretb <- renderTable({
+  output$step2_celltb <- renderTable({
     if(is.null(all_files)) return(NULL)
     if(is.null(step1_res())) return(NULL)
-    df <- structure_tb()
-    df$SimiRetain <- df$SimiRetain
-    df$" " <- ifelse(df$DCcheck, "√", "")
+    df <- structure_tb()[,c("data", "DCcheck")]
+    df$" " <- ifelse(df$DCcheck, "√", "X")
+
+    Sys.sleep(1)
+    df[order(df$data), ]
+  }, digits = 3)
+
+  output$step2_simitb <- renderTable({
+    if(is.null(all_files)) return(NULL)
+    if(is.null(step1_res())) return(NULL)
+    df <- structure_tb()[,c("data", "SimiRetain")]
 
     Sys.sleep(1)
     df[order(df$data), ]
