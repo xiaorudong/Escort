@@ -294,7 +294,7 @@ server <- function(input, output) {
 
   output$downloadTraj <- downloadHandler(
     filename = function() {
-      paste0(paste(input$checkDR, input$checkgenes, input$checkTraj, input$checkcls, sep="_"), ".rds")
+      paste0(paste(input$checkDR, input$checkgenes, input$checkTraj, sep="_"), ".rds")
     },
     content = function(file) {
       saveRDS(eval_obj, file = file)

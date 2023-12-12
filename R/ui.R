@@ -155,13 +155,11 @@ ui <- dashboardPage(
                                    choices = c("MDS" = "MDS",
                                                "TSNE" = "TSNE",
                                                "UMAP" = "UMAP")),
-
+                      br(),
                        h4(strong("Fit Trajectory:")),
                        # choose Trajectory methods
                        selectInput("checkTraj", "Trajectory Methods", choices = c("Slingshot" = "Slingshot")),
-                       # input the number of clusters:
-                       numericInput("checkcls", "The number of clusters", value = 3),
-
+                      br(),
                        downloadButton(outputId="downloadTraj", label = "Download Trajectory")
                 ),
                 column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C"))
