@@ -26,7 +26,7 @@ For datasets demonstrating homogeneity, a list of highly variable genes is prese
 
 ### Downstream Analysis
 #### Input:
-Customize your dimension reduction by choosing techniques like UMAP, MDS, or TSNE. Specify the number of highly variable genes and input the number of clusters in the dataset based on prior knowledge. By default, Escort utilizes Slingshot for trajectory fitting.
+Customize your dimension reduction by choosing techniques like UMAP, MDS, or TSNE and specify the number of highly variable genes. By default, Escort utilizes Slingshot for trajectory fitting.
 #### Output:
 **Visualization** <br/>
 Visualize the embedding and trajectory on the left.<br/>
