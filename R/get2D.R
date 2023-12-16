@@ -1,8 +1,8 @@
 
-#' Generate 2D Embeddings by different methods:
+#' Generate 2D Embeddings by different methods
 #'
-#' @param norm_counts A normalized count data matrix: row:genes, column:cells
-#' @param method choose one RD method: MDS, UMAP, PCA, TSNE, ICA
+#' @param norm_counts A normalized count data matrix with genes as rows and cells in columns.
+#' @param method options for dimention reduction: MDS, UMAP, PCA, TSNE, ICA
 #'
 #' @importFrom SCORPIUS reduce_dimensionality
 #' @importFrom umap umap

@@ -1,5 +1,3 @@
-
-
 #' Structure Similarity between Orignal data and Embedding
 #'
 #' @param Cluters object from \code{DCClusterscheck} fucntion.

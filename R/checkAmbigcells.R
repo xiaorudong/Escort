@@ -1,8 +1,8 @@
 #' Check the shape of trajectory curves
 #'
-#' @param obj A trajectory evaluation object from \code{prepTraj} function
-#' @param outlierdetect The method used to detect the outlier: "resistant", "adjbox", "asymmetric", "neutral". The default method is "neutral"
-#' @param fig A figure showing the where are ambiguous cells.
+#' @param obj A basic trajectory evaluation object from \code{prepTraj} function.
+#' @param outlierdetect The method used to detect the outlier: "resistant", "adjbox", "asymmetric", "neutral". The default method is "neutral".
+#' @param fig A figure showing the ambiguous cells within the embedding.
 #'
 #' @importFrom FNN get.knn
 #' @importFrom scales alpha
@@ -12,9 +12,9 @@
 #'
 #' @return A list about the results of structure similarity check between high- and low- dimenaional data.
 #' \itemize{
-#'   \item AmbiguousCells - The name of detected ambiguous cells which are hard to estimate the PT accurately.
-#'   \item NoACells - Number of ambiguous cells
-#'   \item Ambpct - Percentage of ambiguous cells
+#'   \item AmbiguousCells - Vector of ambiguous cells (those considered hard to estimate accurately).
+#'   \item NoACells - Number of ambiguous cells.
+#'   \item Ambpct - Percentage of ambiguous cells.
 #' }
 #'
 #' @export

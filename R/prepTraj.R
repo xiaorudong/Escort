@@ -1,14 +1,14 @@
 #' Trajectory Evaluation Object
 #'
-#' @param dimred A data frame. a 2D embedding from a DR method and the row name is the cell name.
-#' @param PT A data frame or a vector. estimated pseudotime from TI. Each column contains the PT for one lineage.
-#' @param fitLine the fitted curve line got from TI containing line segments between pairs of points.
+#' @param dimred A data frame. A 2D embedding from a DR method and the row name is the cell name.
+#' @param PT A data frame or a vector of estimated pseudotime from TI. Each column contains the pseudotime for one lineage.
+#' @param fitLine the fitted curve line from trajectory containing line segments between pairs of points.
 #'
 #' @return a list containing related information used for future analysis.
 #' \itemize{
-#'   \item Embedding - A data frame. a 2D embedding from a DR method
-#'   \item pse - A data frame. a scaled pseudotime
-#'   \item fitLine - A data frame. line segments between pairs of points.
+#'   \item Embedding - A data frame. A 2D embedding from a DR method.
+#'   \item pse - A data frame. Scaled pseudotime.
+#'   \item fitLine - A data frame. Contains line segments between pairs of points.
 #' }
 #' @export
 
