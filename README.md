@@ -48,13 +48,13 @@ Escort::shinyEscort()
 
 Many more details and examples on how to use the Shiny App or functions directly in R are located in the vignette:
 
-* [Vignette for R package]()
+* [Vignette for R package](vignettes/Escort.Rmd)
 * [Vignette for Shiny App](vignettes/shiny_vignette.md)
 
 
 # Contact/Maintainer
 
-* Xiaoru Dong (xdong1@ufl.edu)  
+* [Xiaoru Dong](https://xiaorudong.github.io) (xdong1@ufl.edu)  
 Department of Biostatistics, University of Florida
 
 * [Rhonda Bacher, PhD](https://www.rhondabacher.com) (rbacher@ufl.edu)  
