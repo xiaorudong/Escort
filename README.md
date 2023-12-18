@@ -1,7 +1,7 @@
 # Escort
 [![DOI](https://zenodo.org/badge/718898361.svg)](https://zenodo.org/doi/10.5281/zenodo.10392544)
 
-<img src="https://github.com/xiaorudong/Escort/blob/main/vignettes/escort_hex.png"  width = "120">
+<img src="https://github.com/xiaorudong/Escort/blob/main/vignettes/escort_hex_v2_.png"  width = "120">
 
 `Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
 
