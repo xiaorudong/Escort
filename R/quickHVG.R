@@ -1,19 +1,19 @@
 #' Quick HVG (simplified from scran)
 #'
-#' @param norm_counts A normalized count data matrix: row:genes, column:cells
+#' @param normcounts A normalized count data matrix: row:genes, column:cells
 #' @importFrom limma weightedLowess weighted.median
 #'
 #' @export
 
 
-quick_model_gene_var <- function(norm_counts) {
+quick_model_gene_var <- function(normcounts) {
   
-  means <- rowMeans(norm_counts)
+  means <- rowMeans(normcounts)
   RowVar <- function(x) {
     rowSums((x - rowMeans(x))^2)/(dim(x)[2] - 1)
   }
-  vars <- RowVar(norm_counts)
-  names(means) <- names(vars) <- rownames(norm_counts)
+  vars <- RowVar(normcounts)
+  names(means) <- names(vars) <- rownames(normcounts)
   
   
   # collected <- scran:::.decompose_log_exprs(x.stats$means, x.stats$vars, fit.stats$means, fit.stats$vars, 

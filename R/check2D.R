@@ -1,7 +1,7 @@
 #' Structure Similarity between Orignal data and Embedding
 #'
 #' @param Cluters object from \code{DCClusterscheck} fucntion.
-#' @param norm_counts a normalized count data matrix: row:genes, column:cells
+#' @param normcounts a normalized count data matrix: row:genes, column:cells
 #' @param dimred A data frame. a 2D embedding from a DR method and the row name is the cell name.
 #' @param fig A figure showing the clusters identified in raw data in the embedding
 #'
@@ -18,12 +18,12 @@
 #'
 #' @export
 
-Similaritycheck <- function(Cluters, norm_counts, dimred, fig=F) {
+Similaritycheck <- function(Cluters, normcounts, dimred, fig=F) {
 
   dimred <- as.data.frame(dimred)
-  dimred <- dimred[colnames(norm_counts),]
+  dimred <- dimred[colnames(normcounts),]
   cut_avg <- Cluters$Clusters
-  cut_avg <- cut_avg[colnames(norm_counts)]
+  cut_avg <- cut_avg[colnames(normcounts)]
   K <- Cluters$K
 
   knn_index <- FNN::get.knn(dimred, k=3)$nn.index
@@ -32,7 +32,7 @@ Similaritycheck <- function(Cluters, norm_counts, dimred, fig=F) {
   knn_overlap <- apply(knn_df, 1, function(x) sum(x[2:4]!=x[1]))
   t_knn <- table(knn_overlap)
 
-  good_rate <- sum(t_knn[as.numeric(names(t_knn))<=1])/ncol(norm_counts)
+  good_rate <- sum(t_knn[as.numeric(names(t_knn))<=1])/ncol(normcounts)
 
   if(fig) {
     plotcol <- as.numeric(as.factor(cut_avg))

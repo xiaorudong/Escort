@@ -4,10 +4,10 @@
 \alias{HVGs_GO}
 \title{GSEA genes between disconnected clusters}
 \usage{
-HVGs_GO(norm_counts, OrgDb = "org.Hs.eg.db")
+HVGs_GO(normcounts, OrgDb = "org.Hs.eg.db")
 }
 \arguments{
-\item{norm_counts}{A normalized count data matrix: row:genes, column:cells}
+\item{normcounts}{A normalized count data matrix: row:genes, column:cells}
 
 \item{OrgDb}{OrgDb}
 }

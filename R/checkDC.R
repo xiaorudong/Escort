@@ -1,7 +1,7 @@
 #' Differentiate Clusters vs Lineages in High-Dimensional Data
 #'
-#' @param dist_mat A distance object that contains the distance between cells from dist() function
-#' @param rawcounts A raw count data matrix: row:genes, column:cells
+#' @param normcounts normalized data matrix: row:genes, column:cells
+#' @param rawcounts raw count data matrix: row:genes, column:cells
 #' @param K The number of clusters if you have prior information. If left NULL, the number of clusters is estimated by scLCA.
 #' @param clust.max The maximum number of clusters used in scLCA. The default number is 10.
 #' @param cutoff The density, determined using the Jaccard index cutoff, serves as a criterion for defining the connectivity of cells. The default value is 0.3.
@@ -17,12 +17,17 @@
 #' @return A list about the results of disconnected clusters detection.
 #' @export
 
-HD_DCClusterscheck <- function(dist_mat, rawcounts,
+HD_DCClusterscheck <- function(normcounts, rawcounts,
                                K=NULL, clust.max=10,
                                cutoff=0.3, checkcells=NULL,
                                connectedCells=NULL, checksize=NULL) {
 
 
+  message("Distance matrix being calculated, this step may be slow for large datasets.")
+  dist_mat <- parallelDist::parDist(t(normcounts), method = "manhattan")
+
+  message("Distance matrix done!")
+  
   if (is.null(K)) {
     # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
     myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)
@@ -75,8 +80,7 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 
 #' Differentiate Clusters vs Lineages in Embedding
 #'
-#' @param dist_mat A distance object that contains the distance between cells from dist() function
-#' @param DRdims A data frame. a 2D embedding from a DR method
+#' @param embedding A data frame of the embedding.
 #' @param cutoff The density, determined using the Jaccard index cutoff, serves as a criterion for defining the connectivity of cells. The default value is 0.1.
 #' @param max.nc The maximum number of clusters used in NbClust. The default number is 5.
 #' @param K The number of clusters if you have prior information. If left NULL, the number of clusters is estimated by NbClust.
@@ -90,12 +94,14 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
 #' @export
 
 
-LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
+LD_DCClusterscheck <- function(embedding, cutoff=0.1,
                                max.nc=5, K=NULL, checkcells=NULL,
                                connectedCells=1, checksize=NULL) {
 
+ dist_mat <- dist(embedding, method = "euclidean")
+                                 
   if(is.null(K)) {
-    res.nbclust <- Escort::NbClust(DRdims, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
+    res.nbclust <- Escort::NbClust(embedding, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
     K <- length(unique(res.nbclust$Best.partition))
     c_cl <- res.nbclust$Best.partition
   } else {

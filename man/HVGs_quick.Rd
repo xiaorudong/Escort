@@ -4,10 +4,10 @@
 \alias{HVGs_quick}
 \title{Find HVGs by using quick scran}
 \usage{
-HVGs_quick(norm_counts)
+HVGs_quick(normcounts)
 }
 \arguments{
-\item{norm_counts}{A normalized count data matrix: row:genes, column:cells}
+\item{normcounts}{A normalized count data matrix: row:genes, column:cells}
 }
 \description{
 Find HVGs by using quick scran

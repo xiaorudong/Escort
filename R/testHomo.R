@@ -1,6 +1,6 @@
 #' Test Homogeneous
 #'
-#' @param norm_counts A normalized count data matrix: row:genes, column:cells
+#' @param normcounts A normalized count data matrix: row:genes, column:cells
 #' @param HVGs Highly variable genes. If there is no input of the highly variable genes, they will be calcualted by `modelGeneVar()` function.
 #' @param g The number of highly variable genes to test
 #' @param num.sim The number of simulations generated for permutation test on spearman correlation. Default is 20000. Reduce this to improve speed.
@@ -16,21 +16,21 @@
 #' }
 #' @export
 
-step1_testHomogeneous <- function(norm_counts, HVGs=NULL, g=100, num.sim = 20000) {
+step1_testHomogeneous <- function(normcounts, HVGs=NULL, g=100, num.sim = 20000) {
   if(is.null(HVGs)) {
-    gene.var <- quick_model_gene_var(norm_counts)
+    gene.var <- quick_model_gene_var(normcounts)
     HVGs <- rownames(gene.var)[1:g]
   }
   if(length(HVGs)<20) return("Please input more highly variable genes.")
 
-  pcDat <- prcomp(t(norm_counts))
+  pcDat <- prcomp(t(normcounts))
   pca_cells <- pcDat$x
   est_pt <- sort(pca_cells[,1])
 
   time_df <- data.frame(Cell=names(est_pt), PT=est_pt)
-  time_df$Cell <- factor(time_df$Cell, levels=colnames(norm_counts))
+  time_df$Cell <- factor(time_df$Cell, levels=colnames(normcounts))
   time_df <- time_df[order(time_df$Cell),]
-  comb_df <- cbind(time_df, t(norm_counts[HVGs,]))
+  comb_df <- cbind(time_df, t(normcounts[HVGs,]))
   comb_df <- comb_df[order(comb_df$PT),]
 
   p_vec_perm <- apply(comb_df[,3:ncol(comb_df)], 2,

@@ -4,12 +4,12 @@
 \alias{Similaritycheck}
 \title{Structure Similarity between Orignal data and Embedding}
 \usage{
-Similaritycheck(Cluters, norm_counts, dimred, fig = F)
+Similaritycheck(Cluters, normcounts, dimred, fig = F)
 }
 \arguments{
 \item{Cluters}{object from \code{DCClusterscheck} fucntion.}
 
-\item{norm_counts}{a normalized count data matrix: row:genes, column:cells}
+\item{normcounts}{a normalized count data matrix: row:genes, column:cells}
 
 \item{dimred}{A data frame. a 2D embedding from a DR method and the row name is the cell name.}
 

@@ -13,7 +13,7 @@ server <- function(input, output) {
   # add image:
   output$home_img <- renderImage({
 
-    list(src = "vignettes/Workflow.png",
+    list(src = "../vignettes/Workflow.png",
          width = 600,
          height = 500)
   }, deleteFile = F)
@@ -25,7 +25,7 @@ server <- function(input, output) {
     as.matrix(mat)
   })
 
-  norm_counts <- reactive({
+  normcounts <- reactive({
     req(input$normfile)
     mat <- read.csv(input$normfile$datapath, row.names=1)
     as.matrix(mat)
@@ -40,8 +40,8 @@ server <- function(input, output) {
   ### load data
   observeEvent(input$upload, {
     mydf$raw <- rawcounts()
-    mydf$norm <- norm_counts()
-    mydf$from <- all(dim(rawcounts())==dim(norm_counts()))
+    mydf$norm <- normcounts()
+    mydf$from <- all(dim(rawcounts())==dim(normcounts()))
   })
   ### clear button
   observeEvent(input$reset, {
@@ -69,8 +69,8 @@ server <- function(input, output) {
   })
 
   output$uploadnote <- renderText({
-    if(mydf$from) return("Find datasets. Begin analysis.")
-    if(!mydf$from) return("No qualified datasets.")
+    if(mydf$from) return("Datasets verified. Begin analysis.")
+    if(!mydf$from) return("No datasets detected.")
     })
 
 
@@ -135,7 +135,7 @@ server <- function(input, output) {
   step1_test1 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
-    step1_testHomogeneous(norm_counts=norm_mat, num.sim = 1000)
+    step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)
   })
 
   output$step1_homogeneous <- renderText({
@@ -151,7 +151,7 @@ server <- function(input, output) {
   step1_hvgs <- reactive({
     if(step1_test1()$signal_pct<0.46) {
       norm_mat <- mydf$norm
-      df <- Escort::HVGs_quick(norm_counts=norm_mat)
+      df <- Escort::HVGs_quick(normcounts=norm_mat)
       return(df)
     }
   })
@@ -169,7 +169,7 @@ server <- function(input, output) {
     if(is.null(input$go_info)) return(NULL)
     if(step1_test1()$signal_pct<0.46) {
       norm_mat <- mydf$norm
-      df <- Escort::HVGs_GO(norm_counts=norm_mat, OrgDb = input$go_info)
+      df <- Escort::HVGs_GO(normcounts=norm_mat, OrgDb = input$go_info)
       return(df)
     }
   })
@@ -178,7 +178,7 @@ server <- function(input, output) {
     if(!mydf$from) return(NULL)
     if(is.null(step1_test1())) return(NULL)
     if(step1_test1()$signal_pct>=0.46) return(NULL)
-    if(is.null(step1_go())) return("There is no gene overlapping between Gene Ontology (GO) sets.")
+    if(is.null(step1_go())) return("There are no genes overlapping Gene Ontology (GO) sets.")
   })
 
   output$homo_go_tb <- DT::renderDT({
@@ -333,7 +333,7 @@ server <- function(input, output) {
     simi_cells <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      simi_cells[[names(all_files())[i]]] <- Similaritycheck(norm_counts=mydf$norm, dimred=subls$Embedding, Cluters=step1_test2())
+      simi_cells[[names(all_files())[i]]] <- Similaritycheck(normcounts=mydf$norm, dimred=subls$Embedding, Cluters=step1_test2())
     }
     return(simi_cells)
   })

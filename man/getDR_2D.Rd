@@ -4,10 +4,10 @@
 \alias{getDR_2D}
 \title{Generate 2D Embeddings by different methods}
 \usage{
-getDR_2D(norm_counts, method)
+getDR_2D(normcounts, method)
 }
 \arguments{
-\item{norm_counts}{A normalized count data matrix with genes as rows and cells in columns.}
+\item{normcounts}{A normalized count data matrix with genes as rows and cells in columns.}
 
 \item{method}{options for dimention reduction: MDS, UMAP, PCA, TSNE, ICA}
 }

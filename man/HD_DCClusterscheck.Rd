@@ -5,7 +5,7 @@
 \title{Differentiate Clusters vs Lineages in High-Dimensional Data}
 \usage{
 HD_DCClusterscheck(
-  dist_mat,
+  normcounts,
   rawcounts,
   K = NULL,
   clust.max = 10,
@@ -16,9 +16,9 @@ HD_DCClusterscheck(
 )
 }
 \arguments{
-\item{dist_mat}{A distance object that contains the distance between cells from dist() function}
+\item{normcounts}{normalized data matrix: row:genes, column:cells}
 
-\item{rawcounts}{A raw count data matrix: row:genes, column:cells}
+\item{rawcounts}{raw count data matrix: row:genes, column:cells}
 
 \item{K}{The number of clusters if you have prior information. If left NULL, the number of clusters is estimated by scLCA.}
 

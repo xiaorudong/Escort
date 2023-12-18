@@ -24,3 +24,20 @@ prepTraj <- function(dimred, PT, fitLine) {
   obj <- list(Embedding=dimred, pse=pse, fitLine=fitLine)
   return(obj)
 }
+
+#' Format line segments (when using Slingshot)
+#'
+#' @param fittedLines principle curves obtained form the slingCurves() function in Slingshot
+#'
+#' @export
+
+segFormat <- function(fittedLines) {
+
+  segLines <- do.call(rbind, lapply(ls_fitLine, function(x) {
+    df_seg <- cbind(x[-nrow(x),],x[-1,])
+    colnames(df_seg) <- c("x0", "y0", "x1", "y1")
+    return(df_seg)
+  }))
+
+  return(segLines)
+}

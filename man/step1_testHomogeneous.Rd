@@ -4,10 +4,10 @@
 \alias{step1_testHomogeneous}
 \title{Test Homogeneous}
 \usage{
-step1_testHomogeneous(norm_counts, HVGs = NULL, g = 100, num.sim = 20000)
+step1_testHomogeneous(normcounts, HVGs = NULL, g = 100, num.sim = 20000)
 }
 \arguments{
-\item{norm_counts}{A normalized count data matrix: row:genes, column:cells}
+\item{normcounts}{A normalized count data matrix: row:genes, column:cells}
 
 \item{HVGs}{Highly variable genes. If there is no input of the highly variable genes, they will be calcualted by `modelGeneVar()` function.}
 

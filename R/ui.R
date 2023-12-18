@@ -16,10 +16,10 @@ ui <- dashboardPage(
     sidebarMenu(id="tabs",
                 menuItem("About", tabName = "home", icon = icon("house-user")),
                 menuItem("Step 1", tabName = "step1"),
-                menuItem("Downstrem Analysis", tabName = "obj"),
+                menuItem("Generate embeddings", tabName = "obj"),
                 menuItem("Step 2", tabName = "step2"),
                 menuItem("Step 3", tabName = "step3"),
-                menuItem("Conclusion", tabName = "conclusion")
+                menuItem("Summary", tabName = "conclusion")
                 #
                 # menuItem("Start Analysis", tabName = "app", icon = icon("circle-play"),
                 #          startExpanded = TRUE,
@@ -55,49 +55,52 @@ ui <- dashboardPage(
 
     tabItems(
       tabItem(tabName = "home",
-              h3(strong("Welcome to Escort")),
+              h3(strong("Welcome to Escort!")),
               fluidRow(
                 column(6,
-                       "Escort is a framework that uses data to evaluate
-                       how well different methods can infer trajectories
-                       from single-cell data. It employs a three-step approach to guide users
-                       through the analysis by providing evaluations of embeddings
-                       representing a series of analysis choices including feature selection,
-                       dimension reduction, and trajectory inference methods.",
+                       "Escort is a framework that evaluates
+                       various data processing decisions in terms of their effect on trajectory inference
+                       on single-cell RNA-seq data. Escort guides users
+                       through a trajectory analysis by providing evaluations of embeddings, which
+                       represent combinations of analysis choices including feature selection,
+                       dimension reduction, normalization, and/or trajectory inference-specific hyperparameters.",
                        br(),
                        br(),
-                       "The first step is to check if the data have a trajectory signal or not.
-                       Sometimes, the data are not suitable for trajectory analysis,
-                       for example, when the cells come from biologically distinct clusters or
-                       sets of cells with insufficient heterogeneity. In these cases,
-                       Escort will tell the user that trajectory inference is not a good idea.",
+                       "In Step 1, Escort will assess the evidence of a trajectory signal in the dataset.
+                       Sometimes, data are not suitable for trajectory analysis,
+                       for example, when cells come from biologically distinct clusters or have insufficient heterogeneity. In these cases,
+                       Escort will alert the user and offers guidance to further investigate the appropriateness of trajectory analysis.",
                        br(),
                        br(),
-                       "The second step is to compare different low-dimensional embeddings and
-                       see how well they capture the relationships between cells
-                       in the original high-dimensional space.
-                       Escort also looks at how dense the cells are in the low-dimensional space,
-                       and prefers embeddings that have a tighter distribution for trajectory analysis.",
+                       "In Step 2, Escort will compare various embeddings, specifically in terms of how well they preserve cellular relationships and the 
+                       distribution of cells in the embedding.",
                        br(),
                        br(),
-                       "The third step is to evaluate how well a specific trajectory inference method
-                       works with a given embedding. This depends on the graph structure and other parameters
-                       that the method uses. Escort also measures how clear the projection of each cell
-                       is along the trajectory, and avoids methods that produce ambiguous results.
-                       Finally, Escort gives an overall score for each analysis option based on the three steps,
-                       and helps the user to find the best way to infer a trajectory from their data. Go to",
-                       a(href = "https://github.com/NabiilahArdini/Shiny-Box",
-                         "GitHub Page"),
-                       "to find more details on the source code.", br()),
-                column(6, imageOutput("home_img"))
+                       "In Step 3, Escort evaluates how well a specific trajectory inference method
+                       interacts with a given embedding. This allows for evaluaton of additional graph structures used by specific methods and consideration of method-specific parameters. 
+
+                       Finally, Escort provides an overall score for each option, as well as, a classification to 
+                       help researchers select more optinal analysis choices for inferring a trajectory from their data.",
+                       br(),
+                       br(),
+                       "For any questions or issues, please submit a comment to our ", a(href = "https://github.com/xiaorudong/Escort/issues",
+                         "GitHub issues page"), ".",
+                       br(),
+                       br(),
+                       br(),
+                       "Additional explanations are provided in our vignette for ", a(href = "https://github.com/xiaorudong/Escort",
+                         "shinyEscort"), "."),
+                       
+                column(2, imageOutput("home_img"))
                 )),
 
       tabItem(tabName = "step1",
               fluidRow(
                 column(width=6,
                        h4(strong("Upload scRNA-seq datasets:")),
-                       "Note: please upload csv files for raw data and normalized data.")),
+                       "Note: please upload .csv files for raw data and normalized data.")),
               fluidRow(column(width = 3,
+                              br(),
                               # read raw data after QC
                               fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv")),
                               # read norm data after QC
@@ -114,14 +117,21 @@ ui <- dashboardPage(
 
               fluidRow(
                 column(width = 6,
-                       box(width=NULL, status = "primary", title = strong("Step 1: Detecting Trajectory Existence"),
-                           "In the first step of our analysis, we will identify two scenarios
-                where trajectory fitting is not feasible: ",br(),
-                           " - Cells represent diverse cell types",  br(),
-                           " - Cells are homogeneous"),
-
+                       box(width=NULL, status = "primary", title = strong("Step 1: Detecting trajectory existence"),
+                           "In the first step of Escort, evidence of a trajectory signal is assessed in two scenarios: ",
+                           br(),
+                           " - Dataset contains distinct cell types",  br(),
+                           " - Cells are too homogeneous"),
+                           br(),
+                           "If the distinct cell type module fails, additional information about cluster-specific differentially expressed genes is provided. Users should examine 
+                           whether fitting a trajectory that connects these cell types is biologically reasonable. If so, then users should re-examine whether intermediate cell types 
+                           exist, presence of batch effects, and choice of normalization method.",
+                           br(),
+                           "If the homogenous cells module fails, the top highly variable genes are shown along with their enrichments. Again, the appropriateness of an underlying trajectory should 
+                           be considered. To proceed, users should investigate whether other processes could be overriding the biological signal on interest (e.g. cell cycle) or excessive
+                            signal from ribosomal or mitochondrial genes.",
                        tabBox(
-                         title = "Diverse cell types", width = NULL, id = "dc",
+                         title = "Distinct cell types", width = NULL, id = "dc",
                          tabPanel("About", strong("Diverse cell types detected?"), textOutput(outputId = "step1_dc")),
                          tabPanel("DE", DT::DTOutput(outputId  = "dc_de_tb")%>% withSpinner(color="#FAD02C"))),
 
@@ -149,18 +159,20 @@ ui <- dashboardPage(
               fluidRow(
                 column(3,
                       h4(strong("Generate embeddings:")),
+                      "Embeddings can be generated invidivually here (in combination with the preferred trajectoy method used in Step 3), or users can generate 
+                      their own embeddings following the workflow in the Escort vignette.",
                        numericInput("checkgenes", "The number of selected HVGs", value = 100, min=0),
                        # choose DR method
-                       selectInput("checkDR", "Dimension Reduction Method",
+                       selectInput("checkDR", "Dimension reduction method",
                                    choices = c("MDS" = "MDS",
                                                "TSNE" = "TSNE",
                                                "UMAP" = "UMAP")),
                       br(),
-                       h4(strong("Fit Trajectory:")),
+                       h4(strong("Fit preliminary trajectory:")),
                        # choose Trajectory methods
-                       selectInput("checkTraj", "Trajectory Methods", choices = c("Slingshot" = "Slingshot")),
+                       selectInput("checkTraj", "Trajectory method", choices = c("Slingshot" = "Slingshot")),
                       br(),
-                       downloadButton(outputId="downloadTraj", label = "Download Trajectory")
+                       downloadButton(outputId="downloadTraj", label = "Download .rds embedding object")
                 ),
                 column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C"))
 
@@ -172,30 +184,25 @@ ui <- dashboardPage(
               fluidRow(
                 column(width=6,
                        box(
-                         width=NULL, status = "primary", title = strong("Step 2: Evaluating the Characteristics of Embeddings"),
-                         "The second step is designed to identify preferred embeddings for performing trajectory inference.
-                Since all methods employ some form of dimension reduction,
-                the first evaluation is the efficacy of low-dimensional embeddings in maintaining
-                the inter-cellular relationships found in the high-dimensional data.
-                The accuracy of trajectory prediction is heavily dependent on the extent to
-                which these relationships are preserved in the embedding.
-                We will evaluate three characteristics of embeddings: ",br(),
-                         " - The retention of inter-cellular relationships that are present in the high-dimensional data",  br(),
-                         " - The preservation of similarity relationships in the low-dimensional embedding",  br(),
-                         " - Cell spread in embeddings"),
+                         width=NULL, status = "primary", title = strong("Step 2: Evaluating the trajectory characteristics of embeddings"),
+                         "Next, Escort identifies preferred embeddings for performing trajectory inference.
+                       We will evaluate three characteristics of each embedding: ",br(),
+                         " - The retention of inter-cellular relationships.",  br(),
+                         " - The preservation of similarity relationships.",  br(),
+                         " - Distribution of cells in the embedding space."),
                        box(
-                         width=NULL, title = "Inter-cellular Relationships", status = "warning",
+                         width=NULL, title = "Inter-cellular relationships", status = "warning",
                          tableOutput(outputId  = "step2_celltb")%>% withSpinner(color="#FAD02C")),
                        box(
-                         width=NULL, title = "Preservation of Similarity Relationships", status = "warning",
+                         width=NULL, title = "Preservation of similarity relationships", status = "warning",
                          tableOutput(outputId  = "step2_simitb")%>% withSpinner(color="#FAD02C")),
                        box(
-                         width=NULL, title = "Cell Spread ", status = "warning",
+                         width=NULL, title = "Cell spread ", status = "warning",
                          tableOutput(outputId = "step2_spreadtb")%>% withSpinner(color="#FAD02C"))
                        ),
                 column(width=3,
-                       h4(strong("Load Embeddings:")),
-                       fileInput("objs", label = NULL, buttonLabel = "Upload rds file", accept = c(".rds"), multiple = TRUE),
+                       h4(strong("Load all embeddings: (multiple allowed)")),
+                       fileInput("objs", label = NULL, buttonLabel = "Upload .rds file", accept = c(".rds"), multiple = TRUE),
                        tableOutput("obj_files"))
               )
       ),
@@ -205,27 +212,20 @@ ui <- dashboardPage(
               fluidRow(
                 box(
                   width=6, status = "primary", title = strong("Step 3: Quantifying trajectory fitting performance"),
-                  "Now that the embeddings have been evaluated independently,
-                I next evaluate them in the context of a trajectory inference method.
-                When using a particular method to fit a trajectory, Escort assessed
-                how many cells are positioned along the trajectory such that their projection
-                is ambiguous. For example, trajectories in a U-shape tend to
-                be inaccurate because some cells can be mapped with similar probabilities to
-                either the starting or ending points of the trajectory.")),
+                  "Embeddings are also evaluated in the context of a trajectory inference method.
+                A preliminary trajectory in inferred and Escort assesses the proportion of cells having an ambiguous projection
+                to the trajectory. For example, trajectories in a U-shape tend to
+                be inaccurate because some cells will have map to opposing pseudotimes with equal probability.")),
               fluidRow(
-                box(width=6, title = "Percentage of Ambiguous Cells", status = "warning",
+                box(width=6, title = "Percentage of ambiguous cells", status = "warning",
                   tableOutput(outputId = "step3_res")%>% withSpinner(color="#FAD02C")))),
 
       tabItem(tabName = "conclusion",
               fluidRow(
                 box(
-                  width=9, status = "primary", title = strong("Suggestions for Embedding Selection"),
-                  "Given the above analysis, we provide a table showing the recommendations for
-                embedding choices based on whether embedding can preserve the original
-                data structure and whether the trajectory adequately reflects
-                the differentiation of the cells. We rate each embedding
-                according to their overall performance and provide suggestions
-                for selecting them.",
+                  width=9, status = "primary", title = strong("Escort suggestions for embedding selection"),
+                  "Below is a table with each embedding's rating according to their overall performance. Embeddings with a score larger than zero are
+                  Recommended for trajectoy inference.",
                   hr(),
                   tableOutput(outputId = "final_res")%>% withSpinner(color="#FAD02C"))),
               fluidRow(

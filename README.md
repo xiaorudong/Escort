@@ -3,6 +3,8 @@
 
 `Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
 
+<img src="https://github.com/xiaorudong/Escort/tree/main/vignettes/escort_hex.png"  width = "70">
+
 ## Installation
 
 You can install `Escort` via GitHub:
@@ -48,8 +50,8 @@ Escort::shinyEscort()
 
 Many more details and examples on how to use the Shiny App or functions directly in R are located in the vignette:
 
-* [Vignette for R package](vignettes/Escort.Rmd)
-* [Vignette for Shiny App](vignettes/shiny_vignette.md)
+* [Vignette for R package](https://www.rhondabacher.com/vignettes/Escort.html)
+* [Vignette for Shiny App](https://www.rhondabacher.com/vignettes/shiny_vignette.html)
 
 
 # Contact/Maintainer

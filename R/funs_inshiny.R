@@ -52,15 +52,15 @@ DE_edgeR <- function(rawcounts, cls) {
 
 #' GSEA genes between disconnected clusters
 #'
-#' @param norm_counts A normalized count data matrix: row:genes, column:cells
+#' @param normcounts A normalized count data matrix: row:genes, column:cells
 #' @param OrgDb OrgDb
 #'
 #' @import clusterProfiler
 #' @import dplyr
 #' @export
 
-HVGs_GO <- function(norm_counts, OrgDb="org.Hs.eg.db") {
-  gene.var <- quick_model_gene_var(norm_counts)
+HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
+  gene.var <- quick_model_gene_var(normcounts)
   HVGs <- rownames(subset(gene.var, FDR < 0.05))
 
   ego <- enrichGO(gene = HVGs, OrgDb = OrgDb, ont = "ALL", keyType = "GENENAME")
@@ -88,13 +88,13 @@ HVGs_GO <- function(norm_counts, OrgDb="org.Hs.eg.db") {
 
 #' Find HVGs by using quick scran
 #'
-#' @param norm_counts A normalized count data matrix: row:genes, column:cells
+#' @param normcounts A normalized count data matrix: row:genes, column:cells
 #'
 #' @import dplyr
 #' @export
 
-HVGs_quick <- function(norm_counts) {
-  gene.var <- quick_model_gene_var(norm_counts)
+HVGs_quick <- function(normcounts) {
+  gene.var <- quick_model_gene_var(normcounts)
 
   df <- as.data.frame(gene.var) %>%
     mutate(across(1:6, round, 3)) %>%

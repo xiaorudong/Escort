@@ -5,8 +5,7 @@
 \title{Differentiate Clusters vs Lineages in Embedding}
 \usage{
 LD_DCClusterscheck(
-  dist_mat,
-  DRdims,
+  embedding,
   cutoff = 0.1,
   max.nc = 5,
   K = NULL,
@@ -16,9 +15,7 @@ LD_DCClusterscheck(
 )
 }
 \arguments{
-\item{dist_mat}{A distance object that contains the distance between cells from dist() function}
-
-\item{DRdims}{A data frame. a 2D embedding from a DR method}
+\item{embedding}{A data frame of the embedding.}
 
 \item{cutoff}{The density, determined using the Jaccard index cutoff, serves as a criterion for defining the connectivity of cells. The default value is 0.1.}
 

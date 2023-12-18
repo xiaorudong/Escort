@@ -4,10 +4,10 @@
 \alias{quick_model_gene_var}
 \title{Quick HVG (simplified from scran)}
 \usage{
-quick_model_gene_var(norm_counts)
+quick_model_gene_var(normcounts)
 }
 \arguments{
-\item{norm_counts}{A normalized count data matrix: row:genes, column:cells}
+\item{normcounts}{A normalized count data matrix: row:genes, column:cells}
 }
 \description{
 Quick HVG (simplified from scran)
