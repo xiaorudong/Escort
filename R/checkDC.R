@@ -63,9 +63,11 @@ HD_DCClusterscheck <- function(dist_mat, rawcounts,
                   K=K, Clusters=c_cl, ifConnected=NA))
     }
     if (any(table(c_cl)>10)) {
-      Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl,
+      toret <- Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl,
                                cutoff=cutoff, checkcells=checkcells,
                                connectedCells=connectedCells, checksize=checksize)
+      toret$DCcheck <- paste0(toret$DCcheck, " Proceed to the homogeneity check step next.")
+      return(toret)
     }
   }
 }
@@ -104,9 +106,11 @@ LD_DCClusterscheck <- function(dist_mat, DRdims, cutoff=0.1,
     return(list(DCcheck="There are small clusters deteced. Please do clustering again",
                 K=K, Clusters=c_cl))
   } else {
-    Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl, cutoff=cutoff,
+    toret <- Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl, cutoff=cutoff,
                              checkcells=checkcells, connectedCells=connectedCells,
                              checksize=checksize)
+    toret$DCcheck <- paste0(toret$DCcheck, " Proceed to the next evaluation step.")
+    return(toret)
   }
 }
 
@@ -233,7 +237,7 @@ BWClusters_Determination <- function(dist_mat, K, c_cl, cutoff=0.3, checkcells=N
     check <- check1 & check2 & check4
   }
 
-  DCdecision <- ifelse(check,"Congratulations! Escort did not find null spaces between clusters. Proceed to the homogeneity check step next.",
+  DCdecision <- ifelse(check,"Congratulations! Escort did not find null spaces between clusters.",
                        "There appears to be null spaces between clusters. We do not recommend proceeding with trajectory analysis without further investigation. Please see the vignette for recommendations.")
 
   return(list(DCcheck=DCdecision, ifConnected=check, Jaccardsummary=combnt,
