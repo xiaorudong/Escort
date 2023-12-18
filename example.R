@@ -1,9 +1,9 @@
 
 library(Escort)
 library(parallelDist) # for fast calculation of the distance matrix.
-library(cluster)
+# library(cluster)
 library(mclust)
-library(RMTstat)
+# library(RMTstat)
 
 
 
@@ -52,14 +52,14 @@ gof_eval$occupiedRate
 
 # fit a trajectory
 library(slingshot)
-cls <- Mclust(dimred)$classification
+cls <- mclust::Mclust(dimred)$classification
 ti_out <- slingshot(data=dimred, clusterLabels=cls)
 rawpse <- slingPseudotime(ti_out, na=T)
 ls_fitLine <- lapply(slingCurves(ti_out), function(x) x$s[x$ord,])
 
 library(grDevices)
-library(RColorBrewer)
-colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
+colors <- colorRampPalette(brewCOLS)(100)
 plotcol <- colors[cut(rawpse, breaks=100)]
 plot(dimred, col = plotcol, pch=16, cex.lab=1.5, cex.axis=1.5, cex.main=1.5, cex.sub=1.5)
 lines(SlingshotDataSet(ti_out), lwd=2, col='black')

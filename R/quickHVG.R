@@ -1,7 +1,7 @@
 #' Quick HVG (simplified from scran)
 #'
 #' @param norm_counts A normalized count data matrix: row:genes, column:cells
-#' @importFrom limma weightedLowess
+#' @importFrom limma weightedLowess weighted.median
 #'
 #' @export
 

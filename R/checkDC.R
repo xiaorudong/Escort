@@ -13,7 +13,6 @@
 #' @importFrom SingleCellExperiment SingleCellExperiment colData
 #' @importFrom scLCA myscLCA
 #' @importFrom SC3 sc3
-#' @import devtools
 #'
 #' @return A list about the results of disconnected clusters detection.
 #' @export

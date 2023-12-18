@@ -26,7 +26,7 @@ set.seed(11111)
 
 # Introduction
 
-`Escort` is an R package designed to assist users in detecting trajectories, evaluating and ranking various analysis choices. It follows a three-step approach, guiding users through the analysis process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis choices. This encompasses features like feature selection, dimension reduction, and trajectory inference methods, along with their respective hyperparameters.
+`Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
 
 # Installation
 
@@ -59,10 +59,6 @@ install.packages("PACKAGE NAME")
 
 ```{r, results='hide', message=FALSE, warning=FALSE}
 library(Escort)
-library(parallelDist) #  using a fast calculation method for the distance matrix
-library(cluster)
-library(mclust)
-library(RMTstat)
 ```
 
 ### Example data for single-cell data
@@ -145,7 +141,7 @@ As an example, we use Slingshot for trajectory fitting.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(slingshot)
-cls <- Mclust(dimred)$classification
+cls <- mclust::Mclust(dimred)$classification
 ti_out <- slingshot(data=dimred, clusterLabels=cls)
 rawpse <- slingPseudotime(ti_out, na=T)
 ls_fitLine <- lapply(slingCurves(ti_out), function(x) x$s[x$ord,])

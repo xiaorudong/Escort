@@ -6,8 +6,6 @@
 #'
 #' @importFrom FNN get.knn
 #' @importFrom scales alpha
-#' @importFrom plyr round_any
-#' @import RColorBrewer
 #' @import graphics
 #'
 #' @return A list about the results of structure similarity check between high- and low- dimenaional data.
@@ -21,6 +19,11 @@
 
 UshapeDetector <- function(obj, outlierdetect='neutral', fig=F) {
 
+  # colors obtained from brewer.pal(11,'Spectral')[-6]
+  brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
+  round_any = function(x, accuracy, f=round){f(x/ accuracy) * accuracy}
+  
+  
   dimred <- obj$Embedding
   pse <- obj$pse
   fitLine <- obj$fitLine
@@ -31,7 +34,7 @@ UshapeDetector <- function(obj, outlierdetect='neutral', fig=F) {
   if((nrow(dimred)/nlineage)/100<10) {
     num <- 10
   } else {
-    num <- plyr::round_any((nrow(dimred)/nlineage)/100, 10, f = round)
+    num <- round_any((nrow(dimred)/nlineage)/100, 10, f = round)
   }
 
   pse_ave <- rowMeans(pse, na.rm = T)
@@ -87,7 +90,7 @@ UshapeDetector <- function(obj, outlierdetect='neutral', fig=F) {
   allHR.no <- length(unique(HR_cells_vec))
 
   if(fig) {
-    colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+    colors <- colorRampPalette(brewCOLS)(100)
     pse$Ave <- rowMeans(pse, na.rm = T)
     plotcol <- colors[cut(pse$Ave, breaks=100)]
     plot(dimred, col = scales::alpha(plotcol, 0.7), pch=16)

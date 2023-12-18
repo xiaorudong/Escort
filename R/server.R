@@ -3,7 +3,6 @@ library(mclust)
 library(scales)
 library(slingshot)
 library(DT)
-library(RColorBrewer)
 library(shinyjs)
 library(dplyr)
 library(clusterProfiler)
@@ -251,7 +250,7 @@ server <- function(input, output) {
     dimred <- getDR_2D(sub_counts, input$checkDR)
     # Trajectory
     set.seed(123)
-    cl1 <- Mclust(dimred)$classification
+    cl1 <- mclust::Mclust(dimred)$classification
     ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
     rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
     pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
@@ -266,10 +265,13 @@ server <- function(input, output) {
     prepTraj(dimred, PT=rawpse, fitLine=fitLine)
   })
 
+  # colors obtained from brewer.pal(11,'Spectral')[-6]
+  brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
+  
   # plot the trajectory
   output$trajectory_plot <- renderPlot({
     if(is.null(step23_obj())) return(NULL)
-    colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+    colors <- colorRampPalette(brewCOLS)(100)
     pse <- step23_obj()$pse
     pse$Ave <- rowMeans(pse, na.rm = T)
 
@@ -457,8 +459,11 @@ server <- function(input, output) {
 
     df <- df[order(df$score, decreasing = T), ]
     data_plt <- head(df$Row.names, 6)
-
-    colors <- colorRampPalette(brewer.pal(11,'Spectral')[-6])(100)
+  
+    # colors obtained from brewer.pal(11,'Spectral')[-6]
+    brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
+  
+    colors <- colorRampPalette(brewCOLS)(100)
 
     Sys.sleep(1)
     par(mfrow = c(2, 3))

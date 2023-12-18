@@ -9,7 +9,6 @@
 #' @import mclust
 #' @import slingshot
 #' @importFrom scales alpha
-#' @import RColorBrewer
 #' @import dplyr
 #' @importFrom shinycssloaders withSpinner
 #' @import DT
