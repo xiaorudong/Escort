@@ -11,8 +11,9 @@
 #' @param seed The pseudorandom number used to reproduce the output.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment colData
-#' @importFrom scLCA myscLCA
+#' @import scLCA
 #' @importFrom SC3 sc3
+#' @importFrom parallelDist parDist
 #'
 #' @return A list about the results of disconnected clusters detection.
 #' @export
@@ -22,12 +23,6 @@ HD_DCClusterscheck <- function(normcounts, rawcounts,
                                cutoff=0.3, checkcells=NULL,
                                connectedCells=NULL, checksize=NULL) {
 
-
-  message("Distance matrix being calculated, this step may be slow for large datasets.")
-  dist_mat <- parallelDist::parDist(t(normcounts), method = "manhattan")
-
-  message("Distance matrix done!")
-  
   if (is.null(K)) {
     # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
     myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)
@@ -68,6 +63,11 @@ HD_DCClusterscheck <- function(normcounts, rawcounts,
                   K=K, Clusters=c_cl, ifConnected=NA))
     }
     if (any(table(c_cl)>10)) {
+
+      message("Distance matrix being calculated, this step may be slow for large datasets.")
+      dist_mat <- parallelDist::parDist(t(normcounts), method = "manhattan")
+      message("Distance matrix done!")
+
       toret <- Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl,
                                cutoff=cutoff, checkcells=checkcells,
                                connectedCells=connectedCells, checksize=checksize)
@@ -99,7 +99,7 @@ LD_DCClusterscheck <- function(embedding, cutoff=0.1,
                                connectedCells=1, checksize=NULL) {
 
  dist_mat <- dist(embedding, method = "euclidean")
-                                 
+
   if(is.null(K)) {
     res.nbclust <- Escort::NbClust(embedding, distance = "euclidean", min.nc = 2, max.nc = max.nc, method = "complete", index ="all")
     K <- length(unique(res.nbclust$Best.partition))
