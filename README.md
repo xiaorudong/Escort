@@ -38,6 +38,7 @@ After successful installation, `Escort` and related packages need be loaded into
 
 ``` r
 library(Escort)
+library(scLCA)
 ```
 
 To use Escort as a Shiny App:
