@@ -18,11 +18,13 @@ getDR_2D <- function(normcounts, method) {
   if (method=="MDS") {
     if (!require("SCORPIUS")) install.packages("SCORPIUS")
     dimred <- SCORPIUS::reduce_dimensionality(t(normcounts), dist="spearman", ndim = 2)
+    colnames(dimred) <- c("MDS1", "MDS2")
   }
 
   if(method=="UMAP") {
     if (!require("umap")) install.packages("umap")
     dimred <- umap::umap(t(normcounts))$layout
+    colnames(dimred) <- c("UMAP1", "UMAP2")
   }
 
   if(method=="PCA") {
@@ -35,11 +37,13 @@ getDR_2D <- function(normcounts, method) {
     if (!require("Rtsne")) install.packages("Rtsne")
     dimred <- Rtsne::Rtsne(t(normcounts), dims = 2)$Y
     rownames(dimred) <- rownames(t(normcounts))
+    colnames(dimred) <- c("tSNE1", "tSNE2")
   }
 
   if(method=="ICA") {
     if (!require("fastICA")) install.packages("fastICA")
     dimred <- fastICA::fastICA(t(normcounts), 2)$S
+    colnames(dimred) <- c("IC1", "IC2")
   }
   dimred <- as.data.frame(dimred)
   return(dimred)

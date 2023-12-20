@@ -38,6 +38,7 @@ segFormat <- function(fittedLines) {
     colnames(df_seg) <- c("x0", "y0", "x1", "y1")
     return(df_seg)
   }))
+  segLines <- as.data.frame(segLines)
 
   return(segLines)
 }

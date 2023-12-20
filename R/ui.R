@@ -8,7 +8,6 @@ js <- '.nav-tabs-custom .nav-tabs li.active {
 }"'
 
 
-
 ui <- dashboardPage(
   dashboardHeader(title = "Escort"),
 
@@ -57,7 +56,7 @@ ui <- dashboardPage(
       tabItem(tabName = "home",
               h3(strong("Welcome to Escort!")),
               fluidRow(
-                column(6,
+                column(8,
                        "Escort is a framework that evaluates
                        various data processing decisions in terms of their effect on trajectory inference
                        on single-cell RNA-seq data. Escort guides users
@@ -72,14 +71,14 @@ ui <- dashboardPage(
                        Escort will alert the user and offers guidance to further investigate the appropriateness of trajectory analysis.",
                        br(),
                        br(),
-                       "In Step 2, Escort will compare various embeddings, specifically in terms of how well they preserve cellular relationships and the 
+                       "In Step 2, Escort will compare various embeddings, specifically in terms of how well they preserve cellular relationships and the
                        distribution of cells in the embedding.",
                        br(),
                        br(),
                        "In Step 3, Escort evaluates how well a specific trajectory inference method
-                       interacts with a given embedding. This allows for evaluaton of additional graph structures used by specific methods and consideration of method-specific parameters. 
+                       interacts with a given embedding. This allows for evaluaton of additional graph structures used by specific methods and consideration of method-specific parameters.
 
-                       Finally, Escort provides an overall score for each option, as well as, a classification to 
+                       Finally, Escort provides an overall score for each option, as well as, a classification to
                        help researchers select more optinal analysis choices for inferring a trajectory from their data.",
                        br(),
                        br(),
@@ -87,33 +86,13 @@ ui <- dashboardPage(
                          "GitHub issues page"), ".",
                        br(),
                        br(),
-                       br(),
                        "Additional explanations are provided in our vignette for ", a(href = "https://github.com/xiaorudong/Escort",
-                         "shinyEscort"), "."),
-                       
-                column(2, imageOutput("home_img"))
+                         "shinyEscort"), ".")
+
+                # column(2, imageOutput("home_img"))
                 )),
 
       tabItem(tabName = "step1",
-              fluidRow(
-                column(width=6,
-                       h4(strong("Upload scRNA-seq datasets:")),
-                       "Note: please upload .csv files for raw data and normalized data.")),
-              fluidRow(column(width = 3,
-                              br(),
-                              # read raw data after QC
-                              fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv")),
-                              # read norm data after QC
-                              fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv")),
-                              actionButton("upload", "Import"),
-                              actionButton('reset', 'Clear'),#Clear input dataset#
-                              hr(),
-                              textOutput(outputId = "uploadnote"),
-                              hr()),
-                       column(width = 3,
-                              # h4(strong("Data Info:")),
-                              valueBoxOutput("no_cells", width = NULL),
-                              valueBoxOutput("no_genes", width = NULL))),
 
               fluidRow(
                 column(width = 6,
@@ -121,45 +100,66 @@ ui <- dashboardPage(
                            "In the first step of Escort, evidence of a trajectory signal is assessed in two scenarios: ",
                            br(),
                            " - Dataset contains distinct cell types",  br(),
-                           " - Cells are too homogeneous"),
+                           " - Cells are too homogeneous",
                            br(),
-                           "If the distinct cell type module fails, additional information about cluster-specific differentially expressed genes is provided. Users should examine 
-                           whether fitting a trajectory that connects these cell types is biologically reasonable. If so, then users should re-examine whether intermediate cell types 
+                           br(),
+                           "If the distinct cell type module fails, additional information about cluster-specific differentially expressed genes is provided. Users should examine
+                           whether fitting a trajectory that connects these cell types is biologically reasonable. If so, then users should re-examine whether intermediate cell types
                            exist, presence of batch effects, and choice of normalization method.",
                            br(),
-                           "If the homogenous cells module fails, the top highly variable genes are shown along with their enrichments. Again, the appropriateness of an underlying trajectory should 
+                           br(),
+                           "If the homogenous cells module fails, the top highly variable genes are shown along with their enrichments. Again, the appropriateness of an underlying trajectory should
                            be considered. To proceed, users should investigate whether other processes could be overriding the biological signal on interest (e.g. cell cycle) or excessive
-                            signal from ribosomal or mitochondrial genes.",
-                       tabBox(
-                         title = "Distinct cell types", width = NULL, id = "dc",
-                         tabPanel("About", strong("Diverse cell types detected?"), textOutput(outputId = "step1_dc")),
-                         tabPanel("DE", DT::DTOutput(outputId  = "dc_de_tb")%>% withSpinner(color="#FAD02C"))),
+                            signal from ribosomal or mitochondrial genes.")),
+                  column(width=6,
+                         h4(strong("Upload scRNA-seq datasets:")),
+                         "Note: please upload .csv files for raw data and normalized data.",
+                         fluidRow(
+                           column(width = 6,
+                                br(),
+                                # read raw data after QC
+                                fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv")),
+                                # read norm data after QC
+                                fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv")),
+                                actionButton("upload", "Import"),
+                                actionButton('reset', 'Clear'),#Clear input dataset#
+                                hr(),
+                                textOutput(outputId = "uploadnote"),
+                                hr()),
+                         column(width = 6,
+                                br(),
+                                # h4(strong("Data Info:")),
+                                valueBoxOutput("no_cells", width = NULL),
+                                valueBoxOutput("no_genes", width = NULL))))),
+                fluidRow(
+                  column(width = 6,
+                  tabBox(
+                  title = "Distinct cell types", width = NULL, id = "dc",
+                  tabPanel("About", strong("Diverse cell types detected?"), textOutput(outputId = "step1_dc")),
+                  tabPanel("DE", DT::DTOutput(outputId  = "dc_de_tb")%>% withSpinner(color="#FAD02C"))),
+                  tabBox(
+                  title = "Homogeneous cells", width = NULL, id = "homo",
+                  tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous")),
+                  tabPanel("HVGs", DT::DTOutput(outputId  = "homo_hvgs_tb")%>% withSpinner(color="#FAD02C")),
+                  tabPanel("GO",
+                           helpText("Please select a database that contains information about the genome and gene annotations of a particular organism."),
+                           radioButtons("go_info", "Data From",
+                                        choices = list("Human" = "org.Hs.eg.db", "Mouse" = "org.Mm.eg.db"),selected = 1),
+                           textOutput(outputId = "homo_go_txt"),
+                           DT::DTOutput(outputId  = "homo_go_tb")%>% withSpinner(color="#FAD02C")))),
+                  column(width = 6,
+                         box(width=NULL, status = "warning",
+                    span(textOutput(outputId = "step1_decision"), style = "font-size:20px; font-style:bold; text-align:center"),
+                    plotOutput("step1_plot", height = "260px", width="550px")%>% withSpinner(color="#FAD02C")))
 
-                       tabBox(
-                         title = "Homogeneous cells", width = NULL, id = "homo",
-                         tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous")),
-                         tabPanel("HVGs", DT::DTOutput(outputId  = "homo_hvgs_tb")%>% withSpinner(color="#FAD02C")),
-                         tabPanel("GO",
-                                  helpText("Please select a database that contains information about the genome and gene annotations of a particular organism."),
-                                  radioButtons("go_info", "Data From",
-                                               choices = list("Human" = "org.Hs.eg.db", "Mouse" = "org.Mm.eg.db"),selected = 1),
-                                  textOutput(outputId = "homo_go_txt"),
-                                  DT::DTOutput(outputId  = "homo_go_tb")%>% withSpinner(color="#FAD02C")))
-
-                       ),
-
-                column(width = 6,
-                       box(width=NULL, status = "warning",
-                           span(textOutput(outputId = "step1_decision"), style = "font-size:20px; font-style:bold; text-align:center"),
-                           plotOutput("step1_plot", height = "260px", width="550px")%>% withSpinner(color="#FAD02C"))
-                ))),
+)),
 
 
       tabItem(tabName = "obj",
               fluidRow(
                 column(3,
                       h4(strong("Generate embeddings:")),
-                      "Embeddings can be generated invidivually here (in combination with the preferred trajectoy method used in Step 3), or users can generate 
+                      "Embeddings can be generated invidivually here (in combination with the preferred trajectoy method used in Step 3), or users can generate
                       their own embeddings following the workflow in the Escort vignette.",
                        numericInput("checkgenes", "The number of selected HVGs", value = 100, min=0),
                        # choose DR method

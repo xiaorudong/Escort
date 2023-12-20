@@ -1,4 +1,3 @@
-library(parallelDist)
 library(mclust)
 library(scales)
 library(slingshot)
@@ -10,13 +9,13 @@ library(edgeR)
 
 
 server <- function(input, output) {
-  # add image:
-  output$home_img <- renderImage({
-
-    list(src = "../vignettes/Workflow.png",
-         width = 600,
-         height = 500)
-  }, deleteFile = F)
+  # # add image:
+  # output$home_img <- renderImage({
+  #
+  #   list(src = "images/Workflow.png",
+  #        width = 600,
+  #        height = 500)
+  # }, deleteFile = F)
 
   # step0:
   rawcounts <- reactive({
@@ -99,8 +98,7 @@ server <- function(input, output) {
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
     raw_mat <- mydf$raw
-    dist_mat <- parDist(t(norm_mat), method = "manhattan")
-    HD_DCClusterscheck(dist_mat=dist_mat, rawcounts=raw_mat, clust.max = 5)
+    HD_DCClusterscheck(normcounts=norm_mat, rawcounts=raw_mat, clust.max = 5)
   })
 
   output$step1_dc <- renderText({
@@ -220,12 +218,14 @@ server <- function(input, output) {
     # Visualization
     K <- step1_test2()$K
     par(mfrow=c(1,2))
-    library(umap)
+    # library(umap)
     plotcol <- as.factor(step1_test2()$Clusters)
-    dimred_umap <- umap::umap(t(norm_mat))$layout
-    library(Rtsne)
-    dimred_tsne <- Rtsne::Rtsne(t(norm_mat), dims = 2)$Y
-    rownames(dimred_tsne) <- rownames(t(norm_mat))
+    dimred_umap <- getDR_2D(norm_mat, "UMAP")
+    # dimred_umap <- umap::umap(t(norm_mat))$layout
+    # library(Rtsne)
+    dimred_tsne <- getDR_2D(norm_mat, "TSNE")
+    # dimred_tsne <- Rtsne::Rtsne(t(norm_mat), dims = 2)$Y
+    # rownames(dimred_tsne) <- rownames(t(norm_mat))
 
     Sys.sleep(1)
     plot(dimred_umap, col = alpha(plotcol,0.7), pch=16, main="UMAP")
@@ -239,12 +239,22 @@ server <- function(input, output) {
 
   # generate the obj
 
+  safegenes <- reactive({
+    if(is.null(input$normfile)) return(NULL)
+    if(!mydf$from) return(NULL)
+    # select genes:
+    a <- ifelse(input$checkgenes>nrow(mydf$norm), nrow(mydf$norm), input$checkgenes)
+    a <- ifelse(input$checkgenes<10, 10, input$checkgenes)
+    a <- ifelse(is.na(input$checkgenes), 10, input$checkgenes)
+    return(a)
+  })
+
   step23_obj <- reactive({
     if(is.null(input$normfile)) return(NULL)
     if(!mydf$from) return(NULL)
     # select genes:
     gene.var <- quick_model_gene_var(mydf$norm)
-    genes.HVGs <- rownames(gene.var)[1:input$checkgenes]
+    genes.HVGs <- rownames(gene.var)[1:safegenes()]
     sub_counts <- mydf$norm[genes.HVGs,]
     # DR
     dimred <- getDR_2D(sub_counts, input$checkDR)
@@ -267,7 +277,7 @@ server <- function(input, output) {
 
   # colors obtained from brewer.pal(11,'Spectral')[-6]
   brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
-  
+
   # plot the trajectory
   output$trajectory_plot <- renderPlot({
     if(is.null(step23_obj())) return(NULL)
@@ -296,7 +306,7 @@ server <- function(input, output) {
 
   output$downloadTraj <- downloadHandler(
     filename = function() {
-      paste0(paste(input$checkDR, input$checkgenes, input$checkTraj, sep="_"), ".rds")
+      paste0(paste(input$checkDR, safegenes(), input$checkTraj, sep="_"), ".rds")
     },
     content = function(file) {
       saveRDS(eval_obj, file = file)
@@ -321,7 +331,7 @@ server <- function(input, output) {
     DRLvsC <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      DRLvsC[[names(all_files())[i]]] <- LD_DCClusterscheck(dist_mat=dist(subls$Embedding, method = "euclidean"), DRdims=subls$Embedding, connectedCells = 1)
+      DRLvsC[[names(all_files())[i]]] <- LD_DCClusterscheck(embedding=subls$Embedding, connectedCells = 1)
     }
     return(DRLvsC)
   })
@@ -459,10 +469,10 @@ server <- function(input, output) {
 
     df <- df[order(df$score, decreasing = T), ]
     data_plt <- head(df$Row.names, 6)
-  
+
     # colors obtained from brewer.pal(11,'Spectral')[-6]
     brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
-  
+
     colors <- colorRampPalette(brewCOLS)(100)
 
     Sys.sleep(1)
