@@ -24,7 +24,7 @@ ui <- dashboardPage(
                 #          startExpanded = TRUE,
                 #          # menuSubItem("Load Data", tabName = "load"),
                 #          menuSubItem("Step 1", tabName = "step1"),
-                #          menuSubItem("Downstrem Analysis", tabName = "obj"),
+                #          menuSubItem("Downstream Analysis", tabName = "obj"),
                 #          menuSubItem("Step 2", tabName = "step2"),
                 #          menuSubItem("Step 3", tabName = "step3"),
                 #          menuSubItem("Conclusion", tabName = "conclusion"))
@@ -172,7 +172,7 @@ ui <- dashboardPage(
                        # choose Trajectory methods
                        selectInput("checkTraj", "Trajectory method", choices = c("Slingshot" = "Slingshot")),
                       br(),
-                       downloadButton(outputId="downloadTraj", label = "Download .rds embedding object")
+                       downloadButton(outputId="downloadTraj", label = "Download .rds embedding and trajectory object")
                 ),
                 column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C"))
 
