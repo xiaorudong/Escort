@@ -5,6 +5,7 @@
 
 `Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
 
+Preprint available now: [Data-driven selection of analysis decisions in single-cell RNA-seq trajectory inference](https://www.biorxiv.org/content/10.1101/2023.12.18.572214v1.full)
 
 ## Installation
 
@@ -38,6 +39,7 @@ After successful installation, `Escort` and related packages need be loaded into
 
 ``` r
 library(Escort)
+library(scLCA)
 ```
 
 To use Escort as a Shiny App:

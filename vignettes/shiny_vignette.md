@@ -53,7 +53,7 @@ Click "Download" to save the embedding and trajectory information as an .rds fil
 ### Step 2:
 
 #### Input:
-Next, in Step 2, users upload the .rds files generated in the prior step or generated on their own. In this demonstration, we upload four .rds files that were generated, as shown in the accompanying screenshot.
+Next, in Step 2, users upload the .rds files generated in the prior step or generated on their own. In this demonstration, we upload six .rds files that were generated, as shown in the accompanying screenshot.
 
 #### Output:
 Escort evaluates embeddings based on inter-cellular relationships, preservation of similarity relationships, and cell density, presenting results in tables. <br/>
