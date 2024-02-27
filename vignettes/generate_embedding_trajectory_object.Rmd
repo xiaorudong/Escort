@@ -1,0 +1,55 @@
+---
+title: "Generating an Object for Embedding and Trajectory"
+author: "Xiaoru Dong"
+date: "2024-02-27"
+output: html_document
+fontsize: 13pt
+vignette: >
+  %\VignetteIndexEntry{Escort}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+This tutorial demonstrates how to create an object that stores embedding and trajectory information. This object can then be used in Shiny apps for advanced analysis steps.
+
+```{r, eval=FALSE}
+library(Escort)
+```
+
+### Dimension Reduction Data (`dimred`)
+Ensure `dimred` is a dataframe with two columns representing the 2D embedding coordinates. Each row should represent a cell. The row names of `dimred` should be unique and accurately reflect cell identifiers.
+
+```{r, eval=FALSE}
+rownames(dimred) <- # Unique cell names.
+```
+
+### Pseudotime Estimations (`rawpse`)
+`rawpse` should be either a dataframe or a vector. If it's a dataframe, each column should represent a lineage with pseudotime values, and rows should align with cell names in dimred.
+
+Validate that row names in rawpse match those in dimred to ensure alignment.
+```{r, eval=FALSE}
+rownames(rawpse) <- # Ensure this matches dimred's rownames.
+```
+
+### Fitted Curve Line (`fitLine`)
+`fitLine` should represent the trajectory with line segments between pairs of points. It is formatted as a dataframe, where columns "x0", "y0", "x1", and "y1" denote the starting and ending coordinates of each line segment.
+  
+Example data for `fitLine` - adjust to fit your trajectory data
+```{r, eval=FALSE}
+fitLine <- data.frame(
+  x0 = c(1, 2, 3),  # Starting x-coordinates
+  y0 = c(1, 2, 3),  # Starting y-coordinates
+  x1 = c(2, 3, 4),  # Ending x-coordinates
+  y1 = c(2, 3, 4)   # Ending y-coordinates
+)
+```
+
+### Prepare trajectory object.
+```{r, eval=FALSE}
+eval_obj <- prepTraj(dimred, PT=rawpse, fitLine=fitLine)
+filepath <- "path/to/your_file.rds" # Specify your file path here.
+saveRDS(eval_obj, file = filepath)
+```
+
+This .rds file is now ready to be loaded in Escort Shiny app for further analysis in steps 2 and 3.
+
