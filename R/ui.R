@@ -86,7 +86,7 @@ ui <- dashboardPage(
                          "GitHub issues page"), ".",
                        br(),
                        br(),
-                       "Additional explanations are provided in our vignette for ", a(href = "https://github.com/xiaorudong/Escort",
+                       "Additional explanations are provided in our vignette for ", a(href = "https://www.rhondabacher.com/docs-escort/shiny_vignette.html",
                          "shinyEscort"), ".")
 
                 # column(2, imageOutput("home_img"))
