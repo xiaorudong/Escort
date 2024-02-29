@@ -33,7 +33,7 @@ prepTraj <- function(dimred, PT, fitLine) {
 
 segFormat <- function(fittedLines) {
 
-  segLines <- do.call(rbind, lapply(ls_fitLine, function(x) {
+  segLines <- do.call(rbind, lapply(fittedLines, function(x) {
     df_seg <- cbind(x[-nrow(x),],x[-1,])
     colnames(df_seg) <- c("x0", "y0", "x1", "y1")
     return(df_seg)
