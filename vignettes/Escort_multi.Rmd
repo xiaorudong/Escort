@@ -22,12 +22,6 @@ knitr::opts_chunk$set(echo = TRUE,
                       error = FALSE)
 ```
 
-
-```{r, warning=F, message=F}
-library(Escort)
-set.seed(11111)
-```
-
 # Introduction
 
 `Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
@@ -40,6 +34,8 @@ Here, we demonstrate how to use Escort to evaluate multiple embeddings and traje
 Below we show an example using a simulated single-cell RNA-seq dataset from Saelens et al., 2019, available at (https://zenodo.org/records/1443566). For this example, we pre-normalized the data and removed genes having mean expression less than three. This simulated dataset is characterized by a linear topology structure. 
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(Escort)
+set.seed(11111)
 data("step0_clean_dyntoy_L3")
 ```
 
@@ -126,7 +122,7 @@ Now that the embedding has been evaluated independently, the final step involves
 
 Here, we use Slingshot for trajectory fitting:
 
-```{r, warning=FALSE, error=FALSE, message=FALSE, fig.width=3, fig.height=3, fig.align="left"}
+```{r, warning=FALSE, error=FALSE, message=FALSE, fig.width=6, fig.height=6, fig.align="center"}
 library(slingshot)
 library(mclust)
 cls1 <- Mclust(embedding1)$classification
