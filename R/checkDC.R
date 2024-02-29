@@ -25,7 +25,7 @@ HD_DCClusterscheck <- function(normcounts, rawcounts,
 
   if (is.null(K)) {
     # https://genomebiology.biomedcentral.com/articles/10.1186/s13059-022-02622-0
-    myclust.res <- scLCA::myscLCA(rawcounts, clust.max=clust.max)
+    myclust.res <- myscLCA(rawcounts, clust.max=clust.max)
     c_cl <- myclust.res[[1]]
     names(c_cl) <- colnames(rawcounts)
     K <- max(c_cl)

@@ -7,9 +7,10 @@ Authors@R: c(person("Xiaoru", "Dong", , "xdong1@ufl.edu", role = c("aut", "cre")
 Description: A data-driven evaluation framework for trajectory inference. Escort simplifies trajectory analysis using a three-step approach to guide users through trajectory analysis.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports: 
     alphahull,
+    cluster,
     clusterProfiler,
     dplyr,
     DT,
@@ -19,12 +20,15 @@ Imports:
     graphics,
     grDevices,
     Hmisc,
+    igraph,
     jmuOutlier,
     limma,
+    mclust,
     org.Hs.eg.db,
     org.Mm.eg.db,
     parallelDist,
     plyr,
+    RMTstat,
     robustbase,
     rstatix,
     Rtsne,
@@ -44,7 +48,7 @@ Imports:
     slingshot,
     stats,
     umap
-Remotes: github::hemberg-lab/SC3, bitbucket::scLCA/single_cell_lca
+Remotes: github::hemberg-lab/SC3
 Suggests: 
     knitr,
     rmarkdown,
