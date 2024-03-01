@@ -61,14 +61,14 @@ ui <- dashboardPage(
                 column(8,
                        "Escort is a framework that evaluates
                        various data processing decisions in terms of their effect on trajectory inference
-                       on single-cell RNA-seq data. Escort guides users
+                       with single-cell RNA-seq data. Escort guides users
                        through a trajectory analysis by providing evaluations of embeddings, which
                        represent combinations of analysis choices including feature selection,
                        dimension reduction, normalization, and/or trajectory inference-specific hyperparameters.",
                        br(),
                        br(),
                        "In Step 1, Escort will assess the evidence of a trajectory signal in the dataset.
-                       Sometimes, data are not suitable for trajectory analysis,
+                       Sometimes data are not suitable for trajectory analysis,
                        for example, when cells come from biologically distinct clusters or have insufficient heterogeneity. In these cases,
                        Escort will alert the user and offers guidance to further investigate the appropriateness of trajectory analysis.",
                        br(),
@@ -111,7 +111,7 @@ ui <- dashboardPage(
                            br(),
                            br(),
                            "If the homogenous cells module fails, the top highly variable genes are shown along with their enrichments. Again, the appropriateness of an underlying trajectory should
-                           be considered. To proceed, users should investigate whether other processes could be overriding the biological signal on interest (e.g. cell cycle) or excessive
+                           be considered. To proceed, users should investigate whether other processes could be overriding the biological signal of interest (e.g. cell cycle) or excessive
                             signal from ribosomal or mitochondrial genes.")),
                   column(width=6,
                          h4(strong("Upload scRNA-seq datasets:")),
@@ -161,8 +161,9 @@ ui <- dashboardPage(
               fluidRow(
                 column(3,
                       h4(strong("Generate embeddings:")),
-                      "Embeddings can be generated invidivually here (in combination with the preferred trajectoy method used in Step 3), or users can generate
-                      their own embeddings following the workflow in the Escort vignette.",
+                      "Embeddings can be generated invidivually here (in combination with the preferred trajectory method used in Step 3), or users can generate
+                      their own embeddings following the workflow in the ",a(href = "https://www.rhondabacher.com/docs-escort/generate_embedding_objects_vignette.html",
+                         "Generating data objects for Escort R/Shiny Vignette"), ".", 
                        numericInput("checkgenes", "The number of selected HVGs", value = 100, min=0),
                        # choose DR method
                        selectInput("checkDR", "Dimension reduction method",
@@ -174,7 +175,7 @@ ui <- dashboardPage(
                        # choose Trajectory methods
                        selectInput("checkTraj", "Trajectory method", choices = c("Slingshot" = "Slingshot")),
                       br(),
-                       downloadButton(outputId="downloadTraj", label = "Download .rds embedding and trajectory object")
+                       downloadButton(outputId="downloadTraj", label = "Download .rds object")
                 ),
                 column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C"))
 

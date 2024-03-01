@@ -1,0 +1,102 @@
+---
+title: "Generating embedding/trajectory objects for Escort R/Shiny app"
+author: "Xiaoru Dong and Rhonda Bacher"
+output: html_document
+fontsize: 15pt
+vignette: >
+  %\VignetteIndexEntry{Escort}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+This tutorial demonstrates how to create an object that stores embedding and trajectory information that can then be used in the Shiny app directly in Steps 2 and 3 (bypassing Step 1). This also allows users to evaluate embeddings in batches with ease.
+
+If you have not yet installed Escort, please revisit the main ["Running Escort in R"](https://www.rhondabacher.com/docs-escort/vignettes.html) vignette
+
+We will create the Shiny app-ready object using the function `prepTraj` provided in the Escort package. It requires three arguments: a reduced dimension matrix, estimated pseudotime, and the fitted trajectory.
+
+First, we will make use of the sample dataset provided in the package.
+
+### Load Escort and sample data
+```{r, eval=FALSE}
+library(Escort)
+data("step0_clean_dyntoy_L3")
+```
+
+For this example, we generate an embedding that consists of using 2,000 highly variable genes and using PCA as the dimension reduction.
+
+### Generate embedding
+```{r, eval=FALSE}
+# get highly variable genes
+gene.var <- quick_model_gene_var(norm_counts)
+genes.HVGs <- rownames(gene.var)[1:2000]
+# use PCA to reduce the dimensionality
+embedding1 <- getDR_2D(norm_counts[genes.HVGs,], "PCA")
+```
+
+The object `embedding1` represents the `dimred` argument in the `prepTraj` function. If using alternative procedures, make sure that your `dimred` object is a data frame with two columns representing the 2D embedding coordinates, with each row representing a cell. The row names of `dimred` should be unique and accurately reflect cell identifiers.
+
+We also need to go ahead and fit a trajectory to ensure the embedding works well not just independently, but also in the context of a specific method (Step 3 evaluation). Here we will proceed with Slingshot, however, other methods can be utilized.
+
+```{r, eval=FALSE}
+library(slingshot)
+library(mclust)
+cls1 <- Mclust(embedding1)$classification
+ti_out1 <- slingshot(data=embedding1, clusterLabels=cls1)
+rawpse1 <- slingPseudotime(ti_out1, na=T)
+ls_fitLine1 <- lapply(slingCurves(ti_out1), function(x) x$s[x$ord,])
+```
+
+The object `rawpse1` will be input to the `PT` argument in the `prepTraj` function. Note that this object should be either a data frame or a vector. In the case of a data frame, each column should represent a lineage with pseudotime values, and rows should align with cell names in `dimred` object.
+
+The object `ls_fitLine1` will be input to the `fitLine` argument in the `prepTraj` function. Note that this object represents the trajectory with line segments between pairs of points. It is formatted as a data frame, where columns "x0", "y0", "x1", and "y1" denote the starting and ending coordinates of each line segment.
+
+
+### Prepare the embedding object
+
+Now we use the `prepTraj` function to create an object for evaluation and save it as an .rds file.
+
+```{r, eval=FALSE}
+embed_obj <- prepTraj(dimred=embedding1, PT=rawpse1, fitLine=ls_fitLine1)
+filepath <- "path/to/your_file.rds" # Specify your file path here.
+saveRDS(embed_obj, file = filepath)
+```
+
+This .rds file is now ready to be loaded in Escort Shiny app for further analysis in Steps 2 and 3!
+
+Note that you'll also need to upload the normalized data as an .rds object:
+
+```{r, eval=FALSE}
+filepath <- "path/to/file/norm_counts.rds" # Specify your file path here.
+saveRDS(norm_counts, file = filepath)
+```
+
+
+
+### Generating multiple embedding objects
+
+Now if you want to generate multiple embeddings to compare, here's how to go about this.
+
+Say we want to evaluate different choices of highly variable genes, we'll write a function and a loop to generate and save these quickly.
+
+```{r, eval=FALSE}
+myembeds <- function(varyg) {
+  genes.HVGs <- rownames(gene.var)[1:varyg]
+  embedding1 <- getDR_2D(norm_counts[genes.HVGs,], "PCA")
+  cls1 <- Mclust(embedding1)$classification
+  ti_out1 <- slingshot(data=embedding1, clusterLabels=cls1)
+  rawpse1 <- slingPseudotime(ti_out1, na=T)
+  ls_fitLine1 <- lapply(slingCurves(ti_out1), function(x) x$s[x$ord,])
+  
+  embed_obj <- prepTraj(dimred=embedding1, PT=rawpse1, fitLine=ls_fitLine1)
+  filepath <- paste0("path/to/embedding_HVG-", varyg, ".rds")
+  saveRDS(embed_obj, file = filepath)
+}
+
+lapply(c(500, 1000, 1500, 2000, 5000), myembeds)
+```
+
+
+Now, we have generated 5 embeddings that we can upload directly into Step 2 & 3 for evaluation. In practice, you can vary many different processing choices including dimension reduction techniques and hyperparameters within slingshot (or the TI method of choice). 
+
+
