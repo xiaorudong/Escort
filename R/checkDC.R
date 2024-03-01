@@ -11,7 +11,6 @@
 #' @param seed The pseudorandom number used to reproduce the output.
 #'
 #' @importFrom SingleCellExperiment SingleCellExperiment colData
-#' @import scLCA
 #' @importFrom SC3 sc3
 #' @importFrom parallelDist parDist
 #'
