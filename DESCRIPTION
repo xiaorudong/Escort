@@ -35,7 +35,6 @@ Imports:
     S4Vectors,
     SC3,
     scales,
-    scLCA,
     SCORPIUS,
     sfsmisc,
     shiny,
