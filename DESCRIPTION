@@ -23,6 +23,7 @@ Imports:
     igraph,
     jmuOutlier,
     limma,
+    magrittr,
     mclust,
     org.Hs.eg.db,
     org.Mm.eg.db,
