@@ -39,7 +39,7 @@ TWtest <- function(vec) {
     sigma <- ((1/sqrt(n-1)+1/sqrt(m1[i]))^(1/3))*((sqrt(n-1)+sqrt(m1[i]))/n)
     miu <- ((sqrt(n-1)+sqrt(m1[i]))^2)/n
     x[i] = (L-miu)/sigma
-    pvalue[i] <- ptw(x[i], lower.tail = FALSE)
+    pvalue[i] <- RMTstat::ptw(x[i], lower.tail = FALSE)
   }
   TWresult <- data.frame(x, pvalue)
   return(TWresult)
