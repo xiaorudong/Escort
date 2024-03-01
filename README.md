@@ -7,6 +7,8 @@
 
 Preprint available now: [Data-driven selection of analysis decisions in single-cell RNA-seq trajectory inference](https://www.biorxiv.org/content/10.1101/2023.12.18.572214v1.full)
 
+Link to Escort website: [https://www.rhondabacher.com/escort.html](https://www.rhondabacher.com/escort.html)
+
 ## Installation
 
 You can install `Escort` via GitHub:
@@ -48,7 +50,7 @@ Escort::shinyEscort()
 
 Many more details and examples on how to use the Shiny App or functions directly in R are located in the vignettes available below and at the [website](https://www.rhondabacher.com/escort.html):
 
-* [Vignette for R package](https://www.rhondabacher.com/docs-escort/vignette.html)
+* [Vignette for R package](https://www.rhondabacher.com/docs-escort/main_vignette.html)
 * [Vignette for Shiny App](https://www.rhondabacher.com/docs-escort/shiny_vignette.html)
 
 
