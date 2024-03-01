@@ -186,12 +186,12 @@ myscLCA <- function(datmatrix, normalzeddat=NULL, cor.thresh = 0.5, clust.max=10
       }
       clust3 = kmeans(X, mycenter)$cluster
       if (outlier.filter) {
-        sil.1e = mean(silhouette(clust2, pcaT.dis[!outliers,!outliers])[,3])
-        sil.1c = mean(silhouette(clust3, pcaT.dis[!outliers,!outliers])[,3])
+        sil.1e = mean(cluster::silhouette(clust2, pcaT.dis[!outliers,!outliers])[,3])
+        sil.1c = mean(cluster::silhouette(clust3, pcaT.dis[!outliers,!outliers])[,3])
         if (!is.null(pcaT.dise)) {
-          sil.c = mean(silhouette(clust2, pcaT.dise[!outliers,!outliers])[,3])
+          sil.c = mean(cluster::silhouette(clust2, pcaT.dise[!outliers,!outliers])[,3])
           if (sil.c > sil.1e) sil.1e = sil.c
-          sil.c = mean(silhouette(clust3, pcaT.dise[!outliers,!outliers])[,3])
+          sil.c = mean(cluster::silhouette(clust3, pcaT.dise[!outliers,!outliers])[,3])
           if (sil.c > sil.1c) sil.1c = sil.c
         }
         euc.proj = T
@@ -215,12 +215,12 @@ myscLCA <- function(datmatrix, normalzeddat=NULL, cor.thresh = 0.5, clust.max=10
           clust1[i] = which.min(tmp)
         }
       } else {
-        sil.1e = mean(silhouette(clust2, pcaT.dis)[,3])
-        sil.1c = mean(silhouette(clust3, pcaT.dis)[,3])
+        sil.1e = mean(cluster::silhouette(clust2, pcaT.dis)[,3])
+        sil.1c = mean(cluster::silhouette(clust3, pcaT.dis)[,3])
         if (!is.null(pcaT.dise)) {
-          sil.c = mean(silhouette(clust2, pcaT.dise)[,3])
+          sil.c = mean(cluster::silhouette(clust2, pcaT.dise)[,3])
           if (sil.c > sil.1e) sil.1e = sil.c
-          sil.c = mean(silhouette(clust3, pcaT.dise)[,3])
+          sil.c = mean(cluster::silhouette(clust3, pcaT.dise)[,3])
           if (sil.c > sil.1c) sil.1c = sil.c
         }
         euc.proj = T
@@ -266,9 +266,9 @@ myscLCA <- function(datmatrix, normalzeddat=NULL, cor.thresh = 0.5, clust.max=10
         clust3 = clust1
       }
       if (length(unique(clust3)) > 1) {
-        sil.f = mean(silhouette(clust3, pcaT.dis)[,3])
+        sil.f = mean(cluster::silhouette(clust3, pcaT.dis)[,3])
         if (!is.null(pcaT.dise)) {
-          sil.t = mean(silhouette(clust3, pcaT.dise)[,3])
+          sil.t = mean(cluster::silhouette(clust3, pcaT.dise)[,3])
           if (sil.t > sil.f) sil.f = sil.t
         }
         sil.best2[nClust] = sil.f
@@ -332,12 +332,12 @@ myscLCA <- function(datmatrix, normalzeddat=NULL, cor.thresh = 0.5, clust.max=10
     }
     clust3 = kmeans(X, mycenter)$cluster
     if (outlier.filter) {
-      sil.1e = mean(silhouette(clust2, pcaT.dis[!outliers,!outliers])[,3])
-      sil.1c = mean(silhouette(clust3, pcaT.dis[!outliers,!outliers])[,3])
+      sil.1e = mean(cluster::silhouette(clust2, pcaT.dis[!outliers,!outliers])[,3])
+      sil.1c = mean(cluster::silhouette(clust3, pcaT.dis[!outliers,!outliers])[,3])
       if (!is.null(pcaT.dise)) {
-        sil.c = mean(silhouette(clust2, pcaT.dise[!outliers,!outliers])[,3])
+        sil.c = mean(cluster::silhouette(clust2, pcaT.dise[!outliers,!outliers])[,3])
         if (sil.c > sil.1e) sil.1e = sil.c
-        sil.c = mean(silhouette(clust3, pcaT.dise[!outliers,!outliers])[,3])
+        sil.c = mean(cluster::silhouette(clust3, pcaT.dise[!outliers,!outliers])[,3])
         if (sil.c > sil.1c) sil.1c = sil.c
       }
       euc.proj = T
@@ -361,12 +361,12 @@ myscLCA <- function(datmatrix, normalzeddat=NULL, cor.thresh = 0.5, clust.max=10
         clust1[i] = which.min(tmp)
       }
     } else {
-      sil.1e = mean(silhouette(clust2, pcaT.dis)[,3])
-      sil.1c = mean(silhouette(clust3, pcaT.dis)[,3])
+      sil.1e = mean(cluster::silhouette(clust2, pcaT.dis)[,3])
+      sil.1c = mean(cluster::silhouette(clust3, pcaT.dis)[,3])
       if (!is.null(pcaT.dise)) {
-        sil.c = mean(silhouette(clust2, pcaT.dise)[,3])
+        sil.c = mean(cluster::silhouette(clust2, pcaT.dise)[,3])
         if (sil.c > sil.1e) sil.1e = sil.c
-        sil.c = mean(silhouette(clust3, pcaT.dise)[,3])
+        sil.c = mean(cluster::silhouette(clust3, pcaT.dise)[,3])
         if (sil.c > sil.1c) sil.1c = sil.c
       }
       euc.proj = T
