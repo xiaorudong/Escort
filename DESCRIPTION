@@ -47,7 +47,6 @@ Imports:
     slingshot,
     stats,
     umap
-Remotes: github::hemberg-lab/SC3
 Suggests: 
     knitr,
     rmarkdown,
