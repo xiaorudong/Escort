@@ -10,6 +10,7 @@
 #' @import slingshot
 #' @importFrom scales alpha
 #' @import dplyr
+#' @import magrittr
 #' @importFrom shinycssloaders withSpinner
 #' @import DT
 #' @import shinydashboard
@@ -24,5 +25,4 @@ shinyEscort <- function() {
   options(shiny.maxRequestSize = 10000*1024^5)
   shinyApp(ui, server)
 }
-
 
