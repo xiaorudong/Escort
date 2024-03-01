@@ -6,6 +6,7 @@
 #'
 #' @import edgeR
 #' @import dplyr
+#' @import magrittr
 #' @export
 
 DE_edgeR <- function(rawcounts, cls) {
@@ -57,6 +58,7 @@ DE_edgeR <- function(rawcounts, cls) {
 #'
 #' @import clusterProfiler
 #' @import dplyr
+#' @import magrittr
 #' @export
 
 HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
@@ -91,6 +93,7 @@ HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
 #' @param normcounts A normalized count data matrix: row:genes, column:cells
 #'
 #' @import dplyr
+#' @import magrittr
 #' @export
 
 HVGs_quick <- function(normcounts) {

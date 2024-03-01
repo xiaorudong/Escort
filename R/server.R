@@ -6,7 +6,7 @@ library(shinyjs)
 library(dplyr)
 library(clusterProfiler)
 library(edgeR)
-
+library(magrittr)
 
 server <- function(input, output) {
   # # add image:
