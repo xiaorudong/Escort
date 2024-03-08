@@ -4,10 +4,10 @@
 \alias{Similaritycheck}
 \title{Structure Similarity between Orignal data and Embedding}
 \usage{
-Similaritycheck(Cluters, normcounts, dimred, fig = F)
+Similaritycheck(clusters, normcounts, dimred, fig = F)
 }
 \arguments{
-\item{Cluters}{object from \code{DCClusterscheck} fucntion.}
+\item{clusters}{object from \code{DCClusterscheck} fucntion.}
 
 \item{normcounts}{a normalized count data matrix: row:genes, column:cells}
 

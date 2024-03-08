@@ -238,16 +238,46 @@ server <- function(input, output) {
 
 
   # generate the obj
-
   safegenes <- reactive({
-    if(is.null(input$normfile)) return(NULL)
-    if(!mydf$from) return(NULL)
-    # select genes:
-    a <- ifelse(input$checkgenes>nrow(mydf$norm), nrow(mydf$norm), input$checkgenes)
-    a <- ifelse(input$checkgenes<10, 10, input$checkgenes)
-    a <- ifelse(is.na(input$checkgenes), 10, input$checkgenes)
-    return(a)
+    # Ensure input$normfile is not NULL and mydf$from is TRUE
+    if(is.null(input$normfile) || !mydf$from) {
+      return(NULL)
+    }
+    
+    # Get the number of genes available for selection
+    max_genes <- nrow(mydf$norm)
+    
+    # Initialize the variable to store the validated number of genes
+    validated_genes <-NULL
+    
+    # Check if input$checkgenes is NA or NULL, set to default if it is
+    if(is.na(input$checkgenes) || is.null(input$checkgenes)) {
+      validated_genes <- 5
+      showNotification("No input detected or input is invalid. Defaulting to 5 genes.", type = "message")
+    } else {
+      # Validate input$checkgenes within the allowable range
+      validated_genes <- min(max(input$checkgenes, 5), max_genes)
+      
+      # Notify user if their input was adjusted
+      if(input$checkgenes != validated_genes) {
+        if(input$checkgenes < 5) {
+          showNotification("Input is below the minimum allowed number (5). Adjusted to 5.", type = "message")
+        } else if(input$checkgenes > max_genes) {
+          showNotification("Input exceeds the maximum number of genes. Adjusted to maximum available.", type = "message")
+        }
+      }
+    }
+    
+    return(validated_genes)
   })
+  
+  
+  
+  
+  
+  
+  
+  
 
   step23_obj <- reactive({
     if(is.null(input$normfile)) return(NULL)
@@ -343,7 +373,7 @@ server <- function(input, output) {
     simi_cells <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      simi_cells[[names(all_files())[i]]] <- Similaritycheck(normcounts=mydf$norm, dimred=subls$Embedding, Cluters=step1_test2())
+      simi_cells[[names(all_files())[i]]] <- Similaritycheck(normcounts=mydf$norm, dimred=subls$Embedding, clusters=step1_test2())
     }
     return(simi_cells)
   })
@@ -399,6 +429,8 @@ server <- function(input, output) {
     gof_tb[order(gof_tb$data), ]
   }, digits = 3)
 
+
+  
   # step3:
   # test Ushape
 
@@ -474,6 +506,20 @@ server <- function(input, output) {
     brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
 
     colors <- colorRampPalette(brewCOLS)(100)
+    
+    output$table <- downloadHandler(
+      filename = function() {
+        paste("final_res", ".csv", sep="")  # Naming the file with the current date
+      },
+      content = function(file) {
+        req(res_tb())  # Ensure res_tb is not NULL
+        
+        # Assuming res_tb() already has the data structured correctly
+        selected_data <- res_tb()[,c("Row.names", "DCcheck", "SimiRetain", "GOF", "USHAPE", "score", "ranking", "decision", "note")]
+        
+        write.csv(selected_data, file, row.names = FALSE)
+      }
+    )
 
     Sys.sleep(1)
     par(mfrow = c(2, 3))
@@ -489,6 +535,7 @@ server <- function(input, output) {
                y1 = subls$fitLine$y1, lwd = 3)
     }
   })
+
 
 
 }

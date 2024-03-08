@@ -115,7 +115,7 @@ ui <- dashboardPage(
                             signal from ribosomal or mitochondrial genes.")),
                   column(width=6,
                          h4(strong("Upload scRNA-seq datasets:")),
-                         "Note: please upload .csv files for raw data and normalized data.",
+                         "Note: please upload .csv files or .rds files for raw data and normalized data.",
                          fluidRow(
                            column(width = 6,
                                 br(),
@@ -231,6 +231,8 @@ ui <- dashboardPage(
                   Recommended for trajectoy inference.",
                   hr(),
                   tableOutput(outputId = "final_res")%>% withSpinner(color="#FAD02C"))),
+              downloadButton(outputId = "table", label = "Download the table"),
+              hr(),
               fluidRow(
                 box(
                   width=9, status = "warning",

@@ -6,9 +6,10 @@
 #' @param num.sim The number of simulations generated for permutation test on spearman correlation. Default is 20000. Reduce this to improve speed.
 #'
 #' @importFrom jmuOutlier perm.cor.test
-#' @import stats
-#' @import S4Vectors
-#'
+#' @importFrom dplyr first setequal intersect union setdiff
+#' @importFrom stats cor cov start window complete.cases end var xtabs aggregate na.omit sd na.exclude
+#' @importFrom clusterProfiler rename
+#' 
 #' @return A list about the results of trajectory signal detection
 #' \itemize{
 #'   \item signal_pct - the percentage of trajectory signal detected. If the percentage exceeds 50%, we conclude that the trajectory signal detected.

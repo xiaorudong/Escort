@@ -4,8 +4,8 @@
 #' @param rawcounts A raw count data matrix: row:genes, column:cells
 #' @param cls Identified disconnected clusters
 #'
-#' @import edgeR
-#' @import dplyr
+#' @importFrom shinyjs show
+#' @importFrom stats lag filter
 #' @import magrittr
 #' @export
 
@@ -56,8 +56,7 @@ DE_edgeR <- function(rawcounts, cls) {
 #' @param normcounts A normalized count data matrix: row:genes, column:cells
 #' @param OrgDb OrgDb
 #'
-#' @import clusterProfiler
-#' @import dplyr
+#' @importFrom  stats lag filter
 #' @import magrittr
 #' @export
 
@@ -92,7 +91,7 @@ HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
 #'
 #' @param normcounts A normalized count data matrix: row:genes, column:cells
 #'
-#' @import dplyr
+#' @importFrom  stats lag filter
 #' @import magrittr
 #' @export
 
