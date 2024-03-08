@@ -239,26 +239,21 @@ server <- function(input, output) {
 
   # generate the obj
   safegenes <- reactive({
-    # Ensure input$normfile is not NULL and mydf$from is TRUE
     if(is.null(input$normfile) || !mydf$from) {
       return(NULL)
     }
     
-    # Get the number of genes available for selection
     max_genes <- nrow(mydf$norm)
     
-    # Initialize the variable to store the validated number of genes
     validated_genes <-NULL
     
-    # Check if input$checkgenes is NA or NULL, set to default if it is
     if(is.na(input$checkgenes) || is.null(input$checkgenes)) {
       validated_genes <- 5
       showNotification("No input detected or input is invalid. Defaulting to 5 genes.", type = "message")
     } else {
-      # Validate input$checkgenes within the allowable range
+    
       validated_genes <- min(max(input$checkgenes, 5), max_genes)
       
-      # Notify user if their input was adjusted
       if(input$checkgenes != validated_genes) {
         if(input$checkgenes < 5) {
           showNotification("Input is below the minimum allowed number (5). Adjusted to 5.", type = "message")
@@ -509,12 +504,11 @@ server <- function(input, output) {
     
     output$table <- downloadHandler(
       filename = function() {
-        paste("final_res", ".csv", sep="")  # Naming the file with the current date
+        paste("final_res", ".csv", sep="")
       },
       content = function(file) {
-        req(res_tb())  # Ensure res_tb is not NULL
+        req(res_tb())  
         
-        # Assuming res_tb() already has the data structured correctly
         selected_data <- res_tb()[,c("Row.names", "DCcheck", "SimiRetain", "GOF", "USHAPE", "score", "ranking", "decision", "note")]
         
         write.csv(selected_data, file, row.names = FALSE)
