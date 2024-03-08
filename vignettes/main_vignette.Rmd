@@ -123,7 +123,7 @@ DRLvsC$DCcheck
 Next, Escort assesses the effectiveness of the embedding at preserving inter-cellular relationships that were present in the high-dimensional data using the `Similaritycheck()` function. The output percentage represents the rate at which cells in the embedding successfully maintain inter-cellular relationships. A higher percentage indicates a greater preservation of relationships among cells.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-simi_cells <- Similaritycheck(normcounts=norm_counts, dimred=embedding1, Cluters=LvsC)
+simi_cells <- Similaritycheck(normcounts=norm_counts, dimred=embedding1, clusters=LvsC)
 simi_cells$GoodRate
 ```
 
