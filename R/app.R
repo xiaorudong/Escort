@@ -4,17 +4,15 @@
 #' Runs the Escort Shiny app.
 #'
 #' @return This starts up the shiny app interface for Escort.
-#' @import edgeR
-#' @import shinyWidgets
+#' @importFrom shinyjs show alert
 #' @import mclust
-#' @import slingshot
+#' @importFrom stats predict
 #' @importFrom scales alpha
-#' @import dplyr
+#' @importFrom dplyr first setequal intersect union 
 #' @import magrittr
 #' @importFrom shinycssloaders withSpinner
 #' @import DT
 #' @import shinydashboard
-#' @import shinyjs
 #' @import parallelDist
 #' @import org.Hs.eg.db
 #' @import org.Mm.eg.db

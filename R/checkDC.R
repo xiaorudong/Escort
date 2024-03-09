@@ -133,7 +133,9 @@ LD_DCClusterscheck <- function(embedding, cutoff=0.1,
 #' @param connectedCells The minimum number of connected cells between clusters used to identify their connection. If left NULL, the default value is 10.
 #' @param checksize The number of neighbors to consider for each check cell to determine their connectivity. If left NULL, the value is set to be equal to "checkcells".
 #'
-#' @import S4Vectors
+#' @importFrom clusterProfiler rename
+#' @importFrom stats cor cov start window complete.cases end var xtabs aggregate na.omit sd na.exclude
+#' @importFrom dplyr first intersect setdiff setequal union
 #'
 #' @return A list about the results of disconnected clusters detection
 #' \itemize{

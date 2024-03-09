@@ -6,7 +6,7 @@
 #'
 #' @importFrom FNN get.knn
 #' @importFrom scales alpha
-#' @import graphics
+#' @importFrom shinydashboard box
 #'
 #' @return A list about the results of structure similarity check between high- and low- dimenaional data.
 #' \itemize{

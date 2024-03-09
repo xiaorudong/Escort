@@ -1,7 +1,8 @@
 #' paste the boxB() function from univOutl package
 #' @import robustbase
-#' @import Hmisc
-#'
+#' @importFrom dplyr src summarize
+#' @importFrom shinyjs html
+#' 
 #' @export
 
 boxB <- function (x, k = 1.5, method = "asymmetric", weights = NULL,
