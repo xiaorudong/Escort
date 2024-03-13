@@ -11,7 +11,7 @@ vignette: >
 
 This tutorial demonstrates how to create an object that stores embedding and trajectory information that can then be used in the Shiny app directly in Steps 2 and 3 (bypassing Step 1). This also allows users to evaluate embeddings in batches with ease.
 
-If you have not yet installed Escort, please revisit the main ["Running Escort in R"](https://www.rhondabacher.com/docs-escort/vignettes.html) vignette
+If you have not yet installed Escort, please revisit the main ["Running Escort in R"](https://www.rhondabacher.com/docs-escort/vignettes.html) vignette.
 
 We will create the Shiny app-ready object using the function `prepTraj` provided in the Escort package. It requires three arguments: a reduced dimension matrix, estimated pseudotime, and the fitted trajectory.
 

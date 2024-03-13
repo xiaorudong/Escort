@@ -2,10 +2,23 @@
 
 Welcome to shinyEscort, a user-friendly Shiny application designed to help researchers in constructing more accurate trajectories on their single-cell RNA-seq data. With shinyEscort, you input your original data and normalized data, and the application walks you through our evaluation framework.
 
+### Getting started
+In R, assuming you have successfully downloaded Escort, then you can start the Shiny app locally by running the following:
+
+```r
+library(Escort)
+library(shiny)
+
+shinyEscort()
+```
+
+If you encounter any issues, please report these to our Github: [Report Issues](https://github.com/xiaorudong/Escort/issues)
+
 ### About
+
 An overview of shinyEscort and the Escort workflow is provided in the "About" tab positioned at the top of the left column sidebar.
 
-![screen shot of the entry page](shiny_about.png)
+![Screenshot of the entry page](shiny_about.png)
 
 
 ### Step 1
@@ -31,7 +44,7 @@ In instances where the dataset fails this evaluation, detecting distinct cluster
 ***Homogeneous cells***
 For datasets demonstrating too little heterogeneity, a list of highly variable genes is presented in the "HVGs" subtab, followed by a Gene Ontology (GO) enrichment analysis, and the results are presented within the "GO" subtab. Again, the appropriateness of an underlying trajectory should be considered. To proceed, users should investigate whether other processes could be overriding the biological signal of interest (e.g. cell cycle) or if excessive signal from ribosomal or mitochondrial gene is present. Any upstream pre-processing may also need to be re-examined or eliminated. 
 
-![screen shot of step1](shiny_step1.png)
+![Screenshot of Step 1](shiny_step1.png)
 
 
 ### Generate embeddings
@@ -48,7 +61,7 @@ Visualize the embedding and trajectory on the right.<br/>
 **Download .rds** <br/>
 Click "Download" to save the embedding as an .rds file that can be uploaded in the next step.
 
-![screen shot of dr](shiny_dr.png)
+![Screenshot of generating any embedding](shiny_dr.png)
 
 ### Step 2:
 
@@ -68,7 +81,7 @@ Determines the preservation score for similarity relationships, reflecting the p
 **Cell density** <br/>
 Examines the distribution of cells in the embedding. A higher value indicates a more uniform distribution in the two-dimensional embedding space. This uniformity poses challenges for trajectory inference methods in identifying a robust trajectory.
 
-![screen shot of step2](shiny_step2.png)
+![Screenshot of Step 2](shiny_step2.png)
 
 ### Step 3
 
@@ -77,7 +90,7 @@ No manual input required; calculations are performed automatically once Step 2 b
 
 #### Output:
 Utilizing the embedding-specific preliminary trajectory, Escort estimates the proportion of cells with ambiguous projections along the trajectory, displaying the results in a table. A higher value indicates more ambiguous cells in the embeddings.
-![screen shot of step3](shiny_step3.png)
+![Screenshot of Step 3](shiny_step3.png)
 
 
 ### Summary

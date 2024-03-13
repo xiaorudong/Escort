@@ -85,7 +85,7 @@ sapply(DRLvsCs, function(x) x$DCcheck)
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 ## This was obtained in Step 1, or can be re-run here.
-LvsC <- HD_DCClusterscheck(normcounts=norm_counts, rawcounts=rawcounts, K=2)
+LvsC <- HD_DCClusterscheck(normcounts=norm_counts, rawcounts=rawcounts)
 
 simi_cells <- mclapply(embeddings, function(x) {
   Similaritycheck(normcounts=norm_counts, dimred=x$Embedding, clusters=LvsC)

@@ -27,6 +27,8 @@ knitr::opts_chunk$set(echo = TRUE,
 
 `Escort` is a framework for evaluating a single-cell RNA-seq dataset’s suitability for trajectory inference and for quantifying trajectory properties influenced by analysis decisions. Escort is an R package designed to guide users through the trajectory inference process by offering goodness-of-fit evaluations for embeddings that represent a range of analysis decisions such as feature selection, dimension reduction, and trajectory inference method-specific hyperparameters.
 
+If you encounter any issues, please report these to our Github: [Report Issues](https://github.com/xiaorudong/Escort/issues)
+
 # Installation
 
 `Escort` can be installed via GitHub:
@@ -58,6 +60,7 @@ CRAN packages can be installed using:
 install.packages("PACKAGE NAME")
 ```
 
+
 # Example using a simulated single-cell RNA-seq dataset
 
 Below we show an example using a simulated single-cell RNA-seq dataset from Saelens et al., 2019, available at (https://zenodo.org/records/1443566). For this example, we pre-normalized the data and removed genes having mean expression less than three. This simulated dataset is characterized by a linear topology structure. We will also set a seed here for reproducibility.
@@ -79,7 +82,7 @@ The input for this step are the matrices of raw and normalized single-cell RNA-s
 In practice, we do not recommend setting K below, it was done here only for speed.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-LvsC <- HD_DCClusterscheck(normcounts=norm_counts, rawcounts=rawcounts, K=2)
+LvsC <- HD_DCClusterscheck(normcounts=norm_counts, rawcounts=rawcounts)
 LvsC$DCcheck
 ```
 
