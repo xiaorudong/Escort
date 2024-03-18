@@ -248,14 +248,14 @@ server <- function(input, output) {
     validated_genes <-NULL
     
     if(is.na(input$checkgenes) || is.null(input$checkgenes)) {
-      validated_genes <- 5
-      showNotification("No input detected or input is invalid. Defaulting to 5 genes.", type = "message")
+      validated_genes <- 10
+      showNotification("No input detected or input is invalid. Defaulting to 10 genes.", type = "message")
     } else {
-      validated_genes <- min(max(input$checkgenes, 5), max_genes)
+      validated_genes <- min(max(input$checkgenes, 10), max_genes)
       
       if(input$checkgenes != validated_genes) {
-        if(input$checkgenes < 5) {
-          showNotification("Input is below the minimum allowed number (5). Adjusted to 5.", type = "message")
+        if(input$checkgenes < 10) {
+          showNotification("Input is below the minimum allowed number (10). Adjusted to 10.", type = "message")
         } else if(input$checkgenes > max_genes) {
           showNotification("Input exceeds the maximum number of genes. Adjusted to maximum available.", type = "message")
         }
@@ -274,30 +274,36 @@ server <- function(input, output) {
   
 
   step23_obj <- reactive({
-    if(is.null(input$normfile)) return(NULL)
-    if(!mydf$from) return(NULL)
-    # select genes:
-    gene.var <- quick_model_gene_var(mydf$norm)
-    genes.HVGs <- rownames(gene.var)[1:safegenes()]
-    sub_counts <- mydf$norm[genes.HVGs,]
-    # DR
-    dimred <- getDR_2D(sub_counts, input$checkDR)
-    # Trajectory
-    set.seed(123)
-    cl1 <- mclust::Mclust(dimred)$classification
-    ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
-    rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
-    pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
-    ls_fitLine <- lapply(slingCurves(ti_out), function(x) x$s[x$ord,])
-    fitLine <- do.call(rbind, lapply(ls_fitLine, function(x) {
-      df_seg <- cbind(x[-nrow(x),],x[-1,])
-      colnames(df_seg) <- c("x0", "y0", "x1", "y1")
-      return(df_seg)
-    }))
-    fitLine <- as.data.frame(fitLine)
-
-    prepTraj(dimred, PT=rawpse, fitLine=fitLine)
-  })
+    tryCatch({
+      if(is.null(input$normfile)) return(NULL)
+      if(!mydf$from) return(NULL)
+      # select genes:
+      gene.var <- quick_model_gene_var(mydf$norm)
+      genes.HVGs <- rownames(gene.var)[1:safegenes()]
+      sub_counts <- mydf$norm[genes.HVGs,]
+      # DR
+      dimred <- getDR_2D(sub_counts, input$checkDR)
+      # Trajectory
+      set.seed(123)
+      cl1 <- mclust::Mclust(dimred)$classification
+      ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
+      rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
+      pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
+      ls_fitLine <- lapply(slingCurves(ti_out), function(x) x$s[x$ord,])
+      fitLine <- do.call(rbind, lapply(ls_fitLine, function(x) {
+        df_seg <- cbind(x[-nrow(x),],x[-1,])
+        colnames(df_seg) <- c("x0", "y0", "x1", "y1")
+        return(df_seg)
+      }))
+      fitLine <- as.data.frame(fitLine)
+      
+      prepTraj(dimred, PT=rawpse, fitLine=fitLine)
+    }, error = function(e) {
+      showNotification(paste("The input number is invalid, minimum is 10:", e$message), type = "error")
+      return(NULL)
+    })
+    })
+    
 
   # colors obtained from brewer.pal(11,'Spectral')[-6]
   brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
