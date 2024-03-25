@@ -61,7 +61,7 @@ DE_edgeR <- function(rawcounts, cls) {
 #' @export
 
 HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
-  gene.var <- quick_model_gene_var(normcounts)
+  gene.var <- Escort::quick_model_gene_var(normcounts)
   HVGs <- rownames(subset(gene.var, FDR < 0.05))
 
   ego <- enrichGO(gene = HVGs, OrgDb = OrgDb, ont = "ALL", keyType = "GENENAME")
@@ -96,7 +96,7 @@ HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
 #' @export
 
 HVGs_quick <- function(normcounts) {
-  gene.var <- quick_model_gene_var(normcounts)
+  gene.var <- Escort::quick_model_gene_var(normcounts)
 
   df <- as.data.frame(gene.var) %>%
     mutate(across(1:6, round, 3)) %>%

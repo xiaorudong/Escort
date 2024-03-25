@@ -21,6 +21,7 @@
 
 shinyEscort <- function() {
   options(shiny.maxRequestSize = 10000*1024^5)
+  library(Escort)
   shinyApp(ui, server)
 }
 

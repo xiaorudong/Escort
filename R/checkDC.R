@@ -109,11 +109,11 @@ LD_DCClusterscheck <- function(embedding, cutoff=0.1,
   }
   if (any(table(c_cl)<=5)) {
     return(list(DCcheck="There are small clusters deteced. Please do clustering again",
-                K=K, Clusters=c_cl))
+                K=K, Clusters=c_cl, ifConnected=NA))
   } else {
     toret <- Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl, cutoff=cutoff,
                              checkcells=checkcells, connectedCells=connectedCells,
-                             checksize=checksize)
+                             checksize=checksize, ifConnected=TRUE)
     toret$DCcheck <- paste0(toret$DCcheck, " Proceed to the next evaluation step.")
     return(toret)
   }

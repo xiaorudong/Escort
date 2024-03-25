@@ -98,7 +98,7 @@ server <- function(input, output) {
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
     raw_mat <- mydf$raw
-    HD_DCClusterscheck(normcounts=norm_mat, rawcounts=raw_mat, clust.max = 5)
+    Escort::HD_DCClusterscheck(normcounts=norm_mat, rawcounts=raw_mat, clust.max = 5)
   })
 
   output$step1_dc <- renderText({
@@ -133,7 +133,7 @@ server <- function(input, output) {
   step1_test1 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
-    step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)
+    Escort::step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)
   })
 
   output$step1_homogeneous <- renderText({
@@ -220,10 +220,10 @@ server <- function(input, output) {
     par(mfrow=c(1,2))
     # library(umap)
     plotcol <- as.factor(step1_test2()$Clusters)
-    dimred_umap <- getDR_2D(norm_mat, "UMAP")
+    dimred_umap <- Escort::getDR_2D(norm_mat, "UMAP")
     # dimred_umap <- umap::umap(t(norm_mat))$layout
     # library(Rtsne)
-    dimred_tsne <- getDR_2D(norm_mat, "TSNE")
+    dimred_tsne <- Escort::getDR_2D(norm_mat, "TSNE")
     # dimred_tsne <- Rtsne::Rtsne(t(norm_mat), dims = 2)$Y
     # rownames(dimred_tsne) <- rownames(t(norm_mat))
 
@@ -278,18 +278,18 @@ server <- function(input, output) {
       if(is.null(input$normfile)) return(NULL)
       if(!mydf$from) return(NULL)
       # select genes:
-      gene.var <- quick_model_gene_var(mydf$norm)
+      gene.var <- Escort::quick_model_gene_var(mydf$norm)
       genes.HVGs <- rownames(gene.var)[1:safegenes()]
       sub_counts <- mydf$norm[genes.HVGs,]
       # DR
-      dimred <- getDR_2D(sub_counts, input$checkDR)
+      dimred <- Escort::getDR_2D(sub_counts, input$checkDR)
       # Trajectory
       set.seed(123)
       cl1 <- mclust::Mclust(dimred)$classification
       ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
       rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
       pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
-      ls_fitLine <- lapply(slingCurves(ti_out), function(x) x$s[x$ord,])
+      ls_fitLine <- lapply(slingshot::slingCurves(ti_out), function(x) x$s[x$ord,])
       fitLine <- do.call(rbind, lapply(ls_fitLine, function(x) {
         df_seg <- cbind(x[-nrow(x),],x[-1,])
         colnames(df_seg) <- c("x0", "y0", "x1", "y1")
@@ -297,7 +297,7 @@ server <- function(input, output) {
       }))
       fitLine <- as.data.frame(fitLine)
       
-      prepTraj(dimred, PT=rawpse, fitLine=fitLine)
+      Escort::prepTraj(dimred, PT=rawpse, fitLine=fitLine)
     }, error = function(e) {
       showNotification(paste("The input number is invalid, minimum is 10:", e$message), type = "error")
       return(NULL)
@@ -361,8 +361,9 @@ server <- function(input, output) {
     DRLvsC <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      DRLvsC[[names(all_files())[i]]] <- LD_DCClusterscheck(embedding=subls$Embedding, connectedCells = 1)
+      DRLvsC[[names(all_files())[i]]] <- Escort::LD_DCClusterscheck(embedding=subls$Embedding, connectedCells = 1)
     }
+    names(DRLvsC) <- names(all_files())
     return(DRLvsC)
   })
 
@@ -373,8 +374,9 @@ server <- function(input, output) {
     simi_cells <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      simi_cells[[names(all_files())[i]]] <- Similaritycheck(normcounts=mydf$norm, dimred=subls$Embedding, clusters=step1_test2())
+      simi_cells[[names(all_files())[i]]] <- Escort::Similaritycheck(normcounts=mydf$norm, dimred=subls$Embedding, clusters=step1_test2())
     }
+    names(simi_cells) <- names(all_files())
     return(simi_cells)
   })
 
@@ -415,7 +417,7 @@ server <- function(input, output) {
     gof_eval <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      gof_eval[[names(all_files())[i]]] <- GOFeval(subls$Embedding)
+      gof_eval[[names(all_files())[i]]] <- Escort::GOFeval(subls$Embedding)
     }
     return(gof_eval)
   })
@@ -440,7 +442,7 @@ server <- function(input, output) {
     ushap_eval <- list()
     for (i in 1:length(all_files())) {
       subls <- all_files()[[i]]
-      ushap_eval[[names(all_files())[i]]] <- UshapeDetector(subls)
+      ushap_eval[[names(all_files())[i]]] <- Escort::UshapeDetector(subls)
     }
     return(ushap_eval)
   })
@@ -479,7 +481,7 @@ server <- function(input, output) {
     if(is.null(final_tb())) return(NULL)
     if(is.null(step1_res())) return(NULL)
     scoredf <- final_tb()
-    final_df <- calcScore(scoredf)
+    final_df <- Escort::calcScore(scoredf)
     return(final_df)
   })
 
