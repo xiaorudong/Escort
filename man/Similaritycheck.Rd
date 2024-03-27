@@ -4,16 +4,16 @@
 \alias{Similaritycheck}
 \title{Structure Similarity between Orignal data and Embedding}
 \usage{
-Similaritycheck(clusters, normcounts, dimred, fig = F)
+Similaritycheck(clusters, dimred, fig = F)
 }
 \arguments{
 \item{clusters}{object from \code{DCClusterscheck} fucntion.}
 
-\item{normcounts}{a normalized count data matrix: row:genes, column:cells}
-
 \item{dimred}{A data frame. a 2D embedding from a DR method and the row name is the cell name.}
 
 \item{fig}{A figure showing the clusters identified in raw data in the embedding}
+
+\item{normcounts}{a normalized count data matrix: row:genes, column:cells}
 }
 \value{
 A list about the results of structure similarity check between high- and low- dimenaional data.

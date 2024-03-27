@@ -18,12 +18,11 @@
 #'
 #' @export
 
-Similaritycheck <- function(clusters, normcounts, dimred, fig=F) {
+Similaritycheck <- function(clusters, dimred, fig=F) {
 
   dimred <- as.data.frame(dimred)
-  dimred <- dimred[colnames(normcounts),]
   cut_avg <- clusters$Clusters
-  cut_avg <- cut_avg[colnames(normcounts)]
+  cut_avg <- cut_avg[rownames(dimred)]
   K <- clusters$K
 
   knn_index <- FNN::get.knn(dimred, k=3)$nn.index
@@ -32,7 +31,7 @@ Similaritycheck <- function(clusters, normcounts, dimred, fig=F) {
   knn_overlap <- apply(knn_df, 1, function(x) sum(x[2:4]!=x[1]))
   t_knn <- table(knn_overlap)
 
-  good_rate <- sum(t_knn[as.numeric(names(t_knn))<=1])/ncol(normcounts)
+  good_rate <- sum(t_knn[as.numeric(names(t_knn))<=1])/nrow(dimred)
 
   if(fig) {
     plotcol <- as.numeric(as.factor(cut_avg))

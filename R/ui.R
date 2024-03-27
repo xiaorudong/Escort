@@ -3,7 +3,7 @@ library(shinydashboard)
 library(shiny)
 library(shinyjs)
 library(shinycssloaders)
-library(magrittr)
+
 
 js <- '.nav-tabs-custom .nav-tabs li.active {
     border-top-color: #f39c12;
@@ -120,14 +120,16 @@ ui <- dashboardPage(
                            column(width = 6,
                                 br(),
                                 # read raw data after QC
-                                fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv")),
+                                fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv", ".rds")),
                                 # read norm data after QC
-                                fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv")),
+                                fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv", "rds")),
                                 actionButton("upload", "Import"),
                                 actionButton('reset', 'Clear'),#Clear input dataset#
                                 hr(),
                                 textOutput(outputId = "uploadnote"),
-                                hr()),
+                                hr(),
+                                hr(),
+                                downloadButton("downloadStep1Results", "Download Step 1 Results"),),
                          column(width = 6,
                                 br(),
                                 # h4(strong("Data Info:")),
@@ -177,10 +179,20 @@ ui <- dashboardPage(
                       br(),
                        downloadButton(outputId="downloadTraj", label = "Download .rds object")
                 ),
-                column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C"))
+                column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C")),
+                br(),
+                br(),
+                column(9, # New column for the upload button
+                       br(),
+                       br(),
+                       fileInput("normalfile", label = "Optional: Upload the Normalized Data", buttonLabel = "Upload", accept = c(".csv", "rds"))
+                       
+                       
+                     
 
-
-              )),
+               
+                
+              ))),
 
       tabItem(tabName = "step2",
 
@@ -206,9 +218,14 @@ ui <- dashboardPage(
                 column(width=3,
                        h4(strong("Load all embeddings: (multiple allowed)")),
                        fileInput("objs", label = NULL, buttonLabel = "Upload .rds file", accept = c(".rds"), multiple = TRUE),
-                       tableOutput("obj_files"))
-              )
-      ),
+                       tableOutput("obj_files"),
+                       fileInput("step1ResultsUpload", buttonLabel = "Upload .rds file", "Upload Step 1 Results", accept = ".rds")
+                       
+                       
+                )
+                
+              
+      )),
 
 
       tabItem(tabName = "step3",
