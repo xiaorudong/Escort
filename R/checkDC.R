@@ -113,7 +113,7 @@ LD_DCClusterscheck <- function(embedding, cutoff=0.1,
   } else {
     toret <- Escort::BWClusters_Determination(dist_mat=dist_mat, K=K, c_cl=c_cl, cutoff=cutoff,
                              checkcells=checkcells, connectedCells=connectedCells,
-                             checksize=checksize, ifConnected=TRUE)
+                             checksize=checksize)
     toret$DCcheck <- paste0(toret$DCcheck, " Proceed to the next evaluation step.")
     return(toret)
   }
