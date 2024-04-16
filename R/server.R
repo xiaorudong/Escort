@@ -355,36 +355,39 @@ server <- function(input, output) {
 
   
   step23_obj <- reactive({
-    
     req(isTRUE(mydf$readyForEmbedding) || !is.null(mydf$norm))
-    
-    
-   
     currentData <- if (!is.null(mydf$norm)) mydf$norm else mydf$norml
-    
-    
     tryCatch({
       # Select genes
       gene.var <- Escort::quick_model_gene_var(currentData)
-    genes.HVGs <- rownames(gene.var)[1:safegenes()]
+      genes.HVGs <- rownames(gene.var)[1:safegenes()]
       sub_counts <- currentData[genes.HVGs,]
-      # DR
-      dimred <- Escort::getDR_2D(sub_counts, input$checkDR)
-      # Trajectory
-      set.seed(123)
-      cl1 <- mclust::Mclust(dimred)$classification
-      ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
-      rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
-      pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
-      ls_fitLine <- lapply(slingshot::slingCurves(ti_out), function(x) x$s[x$ord,])
-      fitLine <- do.call(rbind, lapply(ls_fitLine, function(x) {
-        df_seg <- cbind(x[-nrow(x),],x[-1,])
-        colnames(df_seg) <- c("x0", "y0", "x1", "y1")
-        return(df_seg)
-      }))
-      fitLine <- as.data.frame(fitLine)
-      
-      Escort::prepTraj(dimred, PT=rawpse, fitLine=fitLine)
+
+      #get all the DR methods in the form of a list which can be looped
+      dr_methods <- strsplit(input$drMethods, ", ")
+      #This list will contain list of objects (objects returned by the porpTraj method)
+      #This list will also be returned
+      list_object_to_return <- list()
+      #Loop through all the selected DR methods
+      for(dr_method in dr_methods) {
+        dimred <- Escort::getDR_2D(sub_counts, dr_method)
+        # Trajectory
+        set.seed(123)
+        cl1 <- mclust::Mclust(dimred)$classification
+        ti_out <- slingshot::slingshot(data=dimred, clusterLabels=cl1)
+        rawpse <- slingshot::slingPseudotime(x=ti_out, na=T)
+        pse <- as.data.frame(rawpse / max(rawpse, na.rm=TRUE))
+        ls_fitLine <- lapply(slingshot::slingCurves(ti_out), function(x) x$s[x$ord,])
+        fitLine <- do.call(rbind, lapply(ls_fitLine, function(x) {
+          df_seg <- cbind(x[-nrow(x),],x[-1,])
+          colnames(df_seg) <- c("x0", "y0", "x1", "y1")
+          return(df_seg)
+        }))
+        fitLine <- as.data.frame(fitLine)
+        returned_object <- Escort::prepTraj(dimred, PT=rawpse, fitLine=fitLine)
+        list_object_to_return[[dr_method]] <- returned_object
+      }
+      return(list_object_to_return)
     }, error = function(e) {
       showNotification(paste("The input number is invalid, minimum is 10:", e$message), type = "error")
       return(NULL)
@@ -395,21 +398,48 @@ server <- function(input, output) {
   # colors obtained from brewer.pal(11,'Spectral')[-6]
   brewCOLS <- c("#9E0142", "#D53E4F", "#F46D43", "#FDAE61", "#FEE08B", "#E6F598", "#ABDDA4", "#66C2A5", "#3288BD", "#5E4FA2")
   
-  # plot the trajectory
-  output$trajectory_plot <- renderPlot({
-    if(is.null(step23_obj())) return(NULL)
+  #utility function to generate plot for embeddings
+  generate_embedding_plot <- function(embedding_name, embedding_object) {
+    if (is.null(embedding_object)) return(NULL)
+    
     colors <- colorRampPalette(brewCOLS)(100)
-    pse <- step23_obj()$pse
-    pse$Ave <- rowMeans(pse, na.rm = T)
+    pse <- embedding_object$pse
+    pse$Ave <- rowMeans(pse, na.rm = TRUE)
     
     Sys.sleep(1)
-    plotcol <- colors[cut(pse$Ave, breaks=100)]
-    plot(step23_obj()$Embedding, col = scales::alpha(plotcol, 0.7), pch=16, main="Estimated PT")
-    segments(x0 = step23_obj()$fitLine$x0,
-             y0 = step23_obj()$fitLine$y0,
-             x1 = step23_obj()$fitLine$x1,
-             y1 = step23_obj()$fitLine$y1, lwd = 3)
-  }, height = 450, width=450)
+    plotcol <- colors[cut(pse$Ave, breaks = 100)]
+    plot(embedding_object$Embedding, col = scales::alpha(plotcol, 0.7), pch = 16, main = paste("Estimated PT -", embedding_name))
+    segments(x0 = embedding_object$fitLine$x0,
+            y0 = embedding_object$fitLine$y0,
+            x1 = embedding_object$fitLine$x1,
+            y1 = embedding_object$fitLine$y1, lwd = 3)
+  }
+
+  #Plot trajectories
+  output$trajectory_plot_MDS <- renderPlot({
+    temp_object <- step23_obj()
+    # as the step23_obj() now contains MDS, TSNE and UMAP embeddings object
+    # we pass the object which we need to plot for in the 
+    # generate_embedding_plot utility function
+    generate_embedding_plot("MDS", temp_object$MDS)
+  }, height = 300, width = 300)
+
+  output$trajectory_plot_TSNE <- renderPlot({
+    temp_object <- step23_obj()
+    # as the step23_obj() now contains MDS, TSNE and UMAP embeddings object
+    # we pass the object which we need to plot for in the 
+    # generate_embedding_plot utility function
+    generate_embedding_plot("TSNE", temp_object$TSNE)
+  }, height = 300, width = 300)
+
+  output$trajectory_plot_UMAP <- renderPlot({
+    temp_object <- step23_obj()
+    # as the step23_obj() now contains MDS, TSNE and UMAP embeddings object
+    # we pass the object which we need to plot for in the 
+    # generate_embedding_plot utility function
+    generate_embedding_plot("UMAP", temp_object$UMAP)
+  }, height = 300, width = 300)
+  
   
   
   # download the obj
@@ -423,24 +453,68 @@ server <- function(input, output) {
   
   output$downloadTraj <- downloadHandler(
     filename = function() {
-      paste0(paste(input$checkDR, safegenes(), input$checkTraj, sep="_"), ".rds")
+      paste0(paste(safegenes(), input$checkTraj, sep="_"), ".rds")
     },
     content = function(file) {
       saveRDS(eval_obj, file = file)
     }
   )
-  
-  
-  
-  
+
+  observe({
+      dr_methods_string <- input$drMethods
+      # If none of the checkbox DR items are selected,then input$drMethods
+      # returns null
+      # Hence if it is null, disable the download button
+      if(is.null(dr_methods_string)) {
+        shinyjs::disable("downloadTraj")
+      } else {
+        #else enable the download button
+        shinyjs::enable("downloadTraj")
+      }
+      
+      #the code below shows/hides the individual plots for
+      #MDS, TSNE, UMAP in the generate embeddings step
+      #this is done based on the checkbox items selected by the user
+      dr_methods_collapsed_string <- paste(input$drMethods, collapse = ", ")
+      if(grepl('MDS', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_MDS")
+      } else {
+        shinyjs::hide("trajectory_plot_MDS")
+      }
+      if(grepl('TSNE', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_TSNE")
+      } else {
+        shinyjs::hide("trajectory_plot_TSNE")
+      }
+      if(grepl('UMAP', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_UMAP")
+      } else {
+        shinyjs::hide("trajectory_plot_UMAP")
+      }
+    })
 
   # load data files
   output$obj_files <- renderTable(input$objs[,1], colnames = F)
 
   all_files <- reactive({
     req(input$objs)
-    purrr::map(input$objs$datapath, readRDS) %>%
+    list_to_return <- list()
+    rds_list <- purrr::map(input$objs$datapath, readRDS) %>%
       purrr::set_names(input$objs$name)
+    
+    #Once we have all the .rds files uploaded, we need to split the objects
+    #inside those files
+    #e.g 100_Slingshot has MDS, TSNE, UMAP objects in it
+    #e.g 10_Slingshot has only MDS in it
+    #so we need to return a total of 4 items to the all_files reactive property
+    #i.e MDS_100_Slingshot, TSNS_100_Slingshot, UMAP_100_Slingshot and MDS_10_Slingshot
+    for(rds_object_name in names(rds_list)) {
+      for(dr_name in names(rds_list[[rds_object_name]])) {
+        updated_keyword_name <- paste(dr_name, "_", rds_object_name, sep = "")
+        list_to_return[[updated_keyword_name]] <- rds_list[[rds_object_name]][[dr_name]]
+      }
+    }
+    return(list_to_return)
   })
 
   HDDCcheck_upload <- reactive({

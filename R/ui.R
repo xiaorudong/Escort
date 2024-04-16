@@ -166,20 +166,25 @@ ui <- dashboardPage(
                       "Embeddings can be generated invidivually here (in combination with the preferred trajectory method used in Step 3), or users can generate
                       their own embeddings following the workflow in the ",a(href = "https://www.rhondabacher.com/docs-escort/generate_embedding_objects_vignette.html",
                          "Generating data objects for Escort R/Shiny Vignette"), ".", 
-                       numericInput("checkgenes", "The number of selected HVGs", value = 100, min=0),
-                       # choose DR method
-                       selectInput("checkDR", "Dimension reduction method",
-                                   choices = c("MDS" = "MDS",
-                                               "TSNE" = "TSNE",
-                                               "UMAP" = "UMAP")),
-                      br(),
-                       h4(strong("Fit preliminary trajectory:")),
+                      numericInput("checkgenes", "The number of selected HVGs", value = 100, min=0),
+                      # choose DR method
+                      checkboxGroupInput(
+                        "drMethods",
+                        "Dimension reduction method",
+                        choices = c("MDS" = "MDS",
+                                    "TSNE" = "TSNE",
+                                    "UMAP" = "UMAP"),
+                        selected = c("MDS", "TSNE", "UMAP")
+                      ),
+                      h4(strong("Fit preliminary trajectory:")),
                        # choose Trajectory methods
-                       selectInput("checkTraj", "Trajectory method", choices = c("Slingshot" = "Slingshot")),
+                      selectInput("checkTraj", "Trajectory method", choices = c("Slingshot" = "Slingshot")),
                       br(),
-                       downloadButton(outputId="downloadTraj", label = "Download .rds object")
+                      downloadButton(outputId="downloadTraj", label = "Download .rds object")
                 ),
-                column(7, plotOutput("trajectory_plot")%>% withSpinner(color="#FAD02C")),
+                column(3, plotOutput("trajectory_plot_MDS", height = 'auto')%>% withSpinner(color="#FAD02C")),
+                column(3, plotOutput("trajectory_plot_TSNE", height = 'auto')%>% withSpinner(color="#FAD02C")),
+                column(3, plotOutput("trajectory_plot_UMAP", height = 'auto')%>% withSpinner(color="#FAD02C")),
                 br(),
                 br(),
                 column(9, # New column for the upload button
