@@ -477,18 +477,24 @@ server <- function(input, output) {
       #this is done based on the checkbox items selected by the user
       dr_methods_collapsed_string <- paste(input$drMethods, collapse = ", ")
       if(grepl('MDS', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_MDS_spinner")
         shinyjs::show("trajectory_plot_MDS")
       } else {
+        shinyjs::hide("trajectory_plot_MDS_spinner")
         shinyjs::hide("trajectory_plot_MDS")
       }
       if(grepl('TSNE', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_TSNE_spinner")
         shinyjs::show("trajectory_plot_TSNE")
       } else {
+        shinyjs::hide("trajectory_plot_TSNE_spinner")
         shinyjs::hide("trajectory_plot_TSNE")
       }
       if(grepl('UMAP', dr_methods_collapsed_string, fixed = TRUE)) {
+        shinyjs::show("trajectory_plot_UMAP_spinner")
         shinyjs::show("trajectory_plot_UMAP")
       } else {
+        shinyjs::hide("trajectory_plot_UMAP_spinner")
         shinyjs::hide("trajectory_plot_UMAP")
       }
     })

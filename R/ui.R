@@ -182,9 +182,9 @@ ui <- dashboardPage(
                       br(),
                       downloadButton(outputId="downloadTraj", label = "Download .rds object")
                 ),
-                column(3, plotOutput("trajectory_plot_MDS", height = 'auto')%>% withSpinner(color="#FAD02C")),
-                column(3, plotOutput("trajectory_plot_TSNE", height = 'auto')%>% withSpinner(color="#FAD02C")),
-                column(3, plotOutput("trajectory_plot_UMAP", height = 'auto')%>% withSpinner(color="#FAD02C")),
+                column(3, plotOutput("trajectory_plot_MDS", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_MDS_spinner")),
+                column(3, plotOutput("trajectory_plot_TSNE", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_TSNE_spinner")),
+                column(3, plotOutput("trajectory_plot_UMAP", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_UMAP_spinner")),
                 br(),
                 br(),
                 column(9, # New column for the upload button
