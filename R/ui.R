@@ -58,7 +58,7 @@ ui <- dashboardPage(
       tabItem(tabName = "home",
               h3(strong("Welcome to Escort!")),
               fluidRow(
-                column(8,
+                column(12,
                        "Escort is a framework that evaluates
                        various data processing decisions in terms of their effect on trajectory inference
                        with single-cell RNA-seq data. Escort guides users
@@ -182,9 +182,9 @@ ui <- dashboardPage(
                       br(),
                       downloadButton(outputId="downloadTraj", label = "Download .rds object")
                 ),
-                column(3, plotOutput("trajectory_plot_MDS", height = 'auto')%>% withSpinner(color="#FAD02C")),
-                column(3, plotOutput("trajectory_plot_TSNE", height = 'auto')%>% withSpinner(color="#FAD02C")),
-                column(3, plotOutput("trajectory_plot_UMAP", height = 'auto')%>% withSpinner(color="#FAD02C")),
+                column(3, plotOutput("trajectory_plot_MDS", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_MDS_spinner")),
+                column(3, plotOutput("trajectory_plot_TSNE", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_TSNE_spinner")),
+                column(3, plotOutput("trajectory_plot_UMAP", height = 'auto')%>% withSpinner(color="#FAD02C", id="trajectory_plot_UMAP_spinner")),
                 br(),
                 br(),
                 column(9, # New column for the upload button
@@ -202,7 +202,7 @@ ui <- dashboardPage(
       tabItem(tabName = "step2",
 
               fluidRow(
-                column(width=6,
+                column(width=9,
                        box(
                          width=NULL, status = "primary", title = strong("Step 2: Evaluating the trajectory characteristics of embeddings"),
                          "Next, Escort identifies preferred embeddings for performing trajectory inference.
@@ -236,19 +236,19 @@ ui <- dashboardPage(
       tabItem(tabName = "step3",
               fluidRow(
                 box(
-                  width=6, status = "primary", title = strong("Step 3: Quantifying trajectory fitting performance"),
+                  width=12, status = "primary", title = strong("Step 3: Quantifying trajectory fitting performance"),
                   "Embeddings are also evaluated in the context of a trajectory inference method.
                 A preliminary trajectory in inferred and Escort assesses the proportion of cells having an ambiguous projection
                 to the trajectory. For example, trajectories in a U-shape tend to
                 be inaccurate because some cells will have map to opposing pseudotimes with equal probability.")),
               fluidRow(
-                box(width=6, title = "Percentage of ambiguous cells", status = "warning",
+                box(width=12, title = "Percentage of ambiguous cells", status = "warning",
                   tableOutput(outputId = "step3_res")%>% withSpinner(color="#FAD02C")))),
 
       tabItem(tabName = "conclusion",
               fluidRow(
                 box(
-                  width=9, status = "primary", title = strong("Escort suggestions for embedding selection"),
+                  width=12, status = "primary", title = strong("Escort suggestions for embedding selection"),
                   "Below is a table with each embedding's rating according to their overall performance. Embeddings with a score larger than zero are
                   Recommended for trajectoy inference.",
                   hr(),
@@ -257,7 +257,7 @@ ui <- dashboardPage(
               hr(),
               fluidRow(
                 box(
-                  width=9, status = "warning",
+                  width=12, status = "warning",
                   plotOutput("final_plot", height = "650px", width = "900px")%>% withSpinner(color="#FAD02C")))
               )
       )

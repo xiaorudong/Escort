@@ -363,8 +363,8 @@ server <- function(input, output) {
       genes.HVGs <- rownames(gene.var)[1:safegenes()]
       sub_counts <- currentData[genes.HVGs,]
 
-      #get all the DR methods in the form of a list which can be looped
-      dr_methods <- strsplit(input$drMethods, ", ")
+      #all types of dr method embeddings to be entered in the list
+      dr_methods <- c("MDS", "TSNE", "UMAP")
       #This list will contain list of objects (objects returned by the porpTraj method)
       #This list will also be returned
       list_object_to_return <- list()
@@ -439,57 +439,53 @@ server <- function(input, output) {
     # generate_embedding_plot utility function
     generate_embedding_plot("UMAP", temp_object$UMAP)
   }, height = 300, width = 300)
-  
-  
-  
-  # download the obj
-  rf2 <- reactiveValues()
-  observe({
-    if(!is.null(step23_obj()))
-      isolate(
-        eval_obj <<- step23_obj()
-      )
-  })
+
   
   output$downloadTraj <- downloadHandler(
     filename = function() {
       paste0(paste(safegenes(), input$checkTraj, sep="_"), ".rds")
     },
     content = function(file) {
-      saveRDS(eval_obj, file = file)
+      all_dr_types_embeddings_list <- step23_obj()
+      
+      #get all the user selected DR methods and store them in a list
+      dr_methods_list <- c()
+      if (!is.null(input$drMethods)) {
+        dr_methods_list <- strsplit(input$drMethods, ", ")
+      }
+      to_download <- list()
+
+      #loop through the umbrella list all_dr_types_embeddings_list
+      #which contains embedding object for all 3 types
+      #and only filter out the ones selected by the user
+      #push those items to a list to_download which will finally be downloaded
+      if(!is.null(all_dr_types_embeddings_list))
+        for(dr_method in dr_methods_list) {
+          to_download[[dr_method]] <- all_dr_types_embeddings_list[[dr_method]]
+        }
+      saveRDS(to_download, file = file)
     }
   )
 
   observe({
+      #by default initially keep the download button disabled
+      shinyjs::disable("downloadTraj")
+      
       dr_methods_string <- input$drMethods
-      # If none of the checkbox DR items are selected,then input$drMethods
-      # returns null
-      # Hence if it is null, disable the download button
-      if(is.null(dr_methods_string)) {
+      is_dr_methods_checkbox_empty <- is.null(dr_methods_string)
+      #check if input methods are selected and show a warning based on that
+      if(is_dr_methods_checkbox_empty) {
+        showNotification("At least one DR method needs to be selected.", type = "error", duration = 10)
+        shinyjs::disable("downloadTraj")
+        return(NULL)
+      }
+      #if the data is still not imported/ready then download button
+      #should be disabled
+      if(isFALSE(mydf$readyForEmbedding) || is.null(mydf$norm)) {
         shinyjs::disable("downloadTraj")
       } else {
-        #else enable the download button
+        # else enable the download button
         shinyjs::enable("downloadTraj")
-      }
-      
-      #the code below shows/hides the individual plots for
-      #MDS, TSNE, UMAP in the generate embeddings step
-      #this is done based on the checkbox items selected by the user
-      dr_methods_collapsed_string <- paste(input$drMethods, collapse = ", ")
-      if(grepl('MDS', dr_methods_collapsed_string, fixed = TRUE)) {
-        shinyjs::show("trajectory_plot_MDS")
-      } else {
-        shinyjs::hide("trajectory_plot_MDS")
-      }
-      if(grepl('TSNE', dr_methods_collapsed_string, fixed = TRUE)) {
-        shinyjs::show("trajectory_plot_TSNE")
-      } else {
-        shinyjs::hide("trajectory_plot_TSNE")
-      }
-      if(grepl('UMAP', dr_methods_collapsed_string, fixed = TRUE)) {
-        shinyjs::show("trajectory_plot_UMAP")
-      } else {
-        shinyjs::hide("trajectory_plot_UMAP")
       }
     })
 
@@ -698,6 +694,17 @@ server <- function(input, output) {
   }, digits = 3)
   
   
+  output$table <- downloadHandler(
+      filename = function() {
+        paste("final_res", ".csv", sep="")
+      },
+      content = function(file) {
+        req(res_tb()) 
+        selected_data <- res_tb()[,c("Row.names", "DCcheck", "SimiRetain", "GOF", "USHAPE", "score", "ranking", "decision", "note")]
+        write.csv(selected_data, file, row.names = FALSE)
+      }
+    )
+  
   output$final_plot <- renderPlot({
     if(is.null(all_files)) return(NULL)
     if(is.null(res_tb())) return(NULL)
@@ -714,18 +721,6 @@ server <- function(input, output) {
     
     colors <- colorRampPalette(brewCOLS)(100)
     
-    output$table <- downloadHandler(
-      filename = function() {
-        paste("final_res", ".csv", sep="")
-      },
-      content = function(file) {
-        req(res_tb()) 
-        
-        selected_data <- res_tb()[,c("Row.names", "DCcheck", "SimiRetain", "GOF", "USHAPE", "score", "ranking", "decision", "note")]
-        
-        write.csv(selected_data, file, row.names = FALSE)
-      }
-    )
     
     Sys.sleep(1)
     par(mfrow = c(2, 3))
