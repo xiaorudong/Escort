@@ -20,7 +20,13 @@
 #'
 
 shinyEscort <- function() {
-  options(shiny.maxRequestSize = 10000*1024^5)
+  options(
+    shiny.maxRequestSize = 10000*1024^5,
+    shiny.launch.browser = FALSE,
+    shiny.port = 19901,
+    shiny.host = "0.0.0.0",
+    test.mode = getOption("shiny.testmode", FALSE),
+    )
   library(Escort)
   shinyApp(ui, server)
 }
