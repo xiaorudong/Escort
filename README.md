@@ -56,7 +56,7 @@ Many more details and examples on how to use the Shiny App or functions directly
 
 # Contact/Maintainer
 
-* [Xiaoru Dong](https://xiaorudong.github.io) (xdong1@ufl.edu)  
+* [Xiaoru Dong, PhD](https://xiaorudong.github.io) (xdong1@ufl.edu)  
 Department of Biostatistics, University of Florida
 
 * [Rhonda Bacher, PhD](https://www.rhondabacher.com) (rbacher@ufl.edu)  
