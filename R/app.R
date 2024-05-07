@@ -25,7 +25,7 @@ shinyEscort <- function() {
     shiny.launch.browser = FALSE,
     shiny.port = 19901,
     shiny.host = "0.0.0.0",
-    test.mode = getOption("shiny.testmode", FALSE),
+    test.mode = getOption("shiny.testmode", FALSE)
     )
   library(Escort)
   shinyApp(ui, server)
