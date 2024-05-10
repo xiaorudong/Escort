@@ -53,6 +53,7 @@ ui <- dashboardPage(
     )),
 
     tags$style(js),
+    tags$head(includeHTML("analytics.html")),
 
     tabItems(
       tabItem(tabName = "home",
