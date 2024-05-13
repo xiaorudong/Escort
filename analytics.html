@@ -1,11 +1,21 @@
 <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-2NN2BEPW6T"></script>
 <script>
-  if (document.location.hostname === "traj-escort.rc.ufl.edu") {
+  function initializeGoogleAnalytics() {
+    let s = document.createElement('script');
+    s.type = "text/javascript"
+    s.async = "true";
+    s.src = "https://www.googletagmanager.com/gtag/js?id=G-2NN2BEPW6T";
+    let x = document.getElementsByTagName('script')[0];
+    x.parentNode.insertBefore(s, x);
+
     window.dataLayer = window.dataLayer || [];
     function gtag(){dataLayer.push(arguments);}
     gtag('js', new Date());
     gtag('config', 'G-2NN2BEPW6T');
-}
+    // you can add facebook-pixel and other cookies here
+  };
+  if (document.location.hostname === "traj-escort.rc.ufl.edu") {
+    initializeGoogleAnalytics()
+  }
   
 </script>
