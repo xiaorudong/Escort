@@ -65,6 +65,24 @@ server <- function(input, output) {
     mydf$norm <- normcounts()
     mydf$from <- all(dim(rawcounts())==dim(normcounts()))
   })
+
+  ### load example data 
+  observeEvent (input$upload_example_data,{
+    isolate({
+      rawcount_linear_splatter <- read.csv("data/rawcount_linear_splatter.csv", row.names = 1)
+      normcount_linear_splatter <- read.csv("data/normcount_linear_splatter.csv", row.names = 1)
+
+      as.matrix(rawcount_linear_splatter)
+      as.matrix(normcount_linear_splatter)
+
+      mydf$raw <- rawcount_linear_splatter
+      mydf$norm <- normcount_linear_splatter
+      mydf$from <- all(dim(normcount_linear_splatter)==dim(normcount_linear_splatter))
+      
+			showNotification("Example data is loading. Please wait.", type="default", duration=8)
+		})
+  })
+
   ### clear button
   observeEvent(input$reset, {
     mydf$raw <- NULL

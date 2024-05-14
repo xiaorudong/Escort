@@ -120,6 +120,9 @@ ui <- dashboardPage(
                          fluidRow(
                            column(width = 6,
                                 br(),
+                                actionButton("upload_example_data", label = "Load Example Data"),
+                                br(),
+                                br(),
                                 # read raw data after QC
                                 fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv", ".rds")),
                                 # read norm data after QC
