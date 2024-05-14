@@ -69,15 +69,18 @@ server <- function(input, output) {
   ### load example data 
   observeEvent (input$upload_example_data,{
     isolate({
-      rawcount_linear_splatter <- read.csv("data/rawcount_linear_splatter.csv", row.names = 1)
-      normcount_linear_splatter <- read.csv("data/normcount_linear_splatter.csv", row.names = 1)
+      raw_count_data_path <- system.file("data", "rawcount_linear_splatter.csv", package = "Escort")
+      rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
+
+      norm_count_data_path <- system.file("data", "normcount_linear_splatter.csv", package = "Escort")
+      normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
 
       as.matrix(rawcount_linear_splatter)
       as.matrix(normcount_linear_splatter)
 
       mydf$raw <- rawcount_linear_splatter
       mydf$norm <- normcount_linear_splatter
-      mydf$from <- all(dim(normcount_linear_splatter)==dim(normcount_linear_splatter))
+      mydf$from <- all(dim(rawcount_linear_splatter)==dim(normcount_linear_splatter))
       
 			showNotification("Example data is loading. Please wait.", type="default", duration=8)
 		})
