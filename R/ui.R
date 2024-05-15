@@ -53,6 +53,7 @@ ui <- dashboardPage(
     )),
 
     tags$style(js),
+    tags$head(includeHTML("analytics.html")),
 
     tabItems(
       tabItem(tabName = "home",
@@ -118,6 +119,9 @@ ui <- dashboardPage(
                          "Note: please upload .csv files or .rds files for raw data and normalized data.",
                          fluidRow(
                            column(width = 6,
+                                br(),
+                                actionButton("upload_example_data", label = "Load Example Data"),
+                                br(),
                                 br(),
                                 # read raw data after QC
                                 fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv", ".rds")),
