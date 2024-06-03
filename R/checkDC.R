@@ -351,10 +351,10 @@ JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
   } else {
     # generate kernel densities
     BIN <- pmax(50, (length(w_vec))/length(unique(w_vec)))
-    dw <- ash::ash1(ash::bin1(w_vec, ab=c(lower, upper), nbin = BIN))
+    temp1 <- capture.output(dw <- ash::ash1(ash::bin1(w_vec, ab=c(lower, upper), nbin = BIN)))
     
     BIN <- pmax(50, (length(b_vec))/length(unique(b_vec)))
-    db <- ash::ash1(ash::bin1(b_vec, ab=c(lower, upper), nbin = BIN))
+    temp1 <- capture.output(db <- ash::ash1(ash::bin1(b_vec, ab=c(lower, upper), nbin = BIN)))
     
     d <- data.frame(x=dw$x, a=dw$y, b=db$y)
     if (plot) {

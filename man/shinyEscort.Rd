@@ -4,7 +4,7 @@
 \alias{shinyEscort}
 \title{Escort}
 \usage{
-shinyEscort()
+shinyEscort(port = 19901, is_local_development = TRUE)
 }
 \value{
 This starts up the shiny app interface for Escort.
