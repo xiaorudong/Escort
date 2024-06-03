@@ -299,9 +299,9 @@ BWClusters <- function(dist_mat, c_cl) {
       Dists_B_cells <- Dists_B[[paste("Group", i, sep="_")]][[gp1]]
       JaccardIndex_vec <- c()
       JaccardIndex_op_vec <- c()
-      for (c in 1:length(Dists_B_cells)) {
-        w_vec <- Dists_W_cells[[c]]
-        b_vec <- Dists_B_cells[[c]]
+      for (xx in 1:length(Dists_B_cells)) {
+        w_vec <- Dists_W_cells[[xx]]
+        b_vec <- Dists_B_cells[[xx]]
 
         Jaccard <- Escort::JaccardIndex_fun(w_vec, b_vec, plot=F)
         JaccardIndex_vec <- c(JaccardIndex_vec, Jaccard$JaccardIndex)
@@ -337,6 +337,7 @@ BWClusters <- function(dist_mat, c_cl) {
 #'   \item JaccardIndex - The Jaccard Index between cells
 #'   \item signJaccardIndex - Edited Jaccard Index. The negative sign is added to show the cell is very close to other clusters.
 #' }
+#' @importFrom ash ash1 bin1
 #' @export
 
 JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
@@ -349,8 +350,12 @@ JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
     JaccardIndex_op=0
   } else {
     # generate kernel densities
-    dw <- density(w_vec, from=lower, to=upper)
-    db <- density(b_vec, from=lower, to=upper)
+    BIN <- pmax(50, (length(w_vec))/length(unique(w_vec)))
+    dw <- ash::ash1(ash::bin1(w_vec, ab=c(lower, upper), nbin = BIN))
+    
+    BIN <- pmax(50, (length(b_vec))/length(unique(b_vec)))
+    db <- ash::ash1(ash::bin1(b_vec, ab=c(lower, upper), nbin = BIN))
+    
     d <- data.frame(x=dw$x, a=dw$y, b=db$y)
     if (plot) {
       plot(dw, main="overlaid density plots")
