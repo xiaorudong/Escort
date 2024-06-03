@@ -293,9 +293,9 @@ server <- function(input, output) {
     # rownames(dimred_tsne) <- rownames(t(norm_mat))
 
     Sys.sleep(1)
-    plot(dimred_umap, col = alpha(plotcol,0.7), pch=16, main="UMAP")
+    plot(dimred_umap, col = scales::alpha(plotcol,0.7), pch=16, main="UMAP")
     legend("topright", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
-    plot(dimred_tsne, col = alpha(plotcol,0.7), pch=16, main="TSNE")
+    plot(dimred_tsne, col = scales::alpha(plotcol,0.7), pch=16, main="TSNE")
     legend("topleft", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
 
   })
