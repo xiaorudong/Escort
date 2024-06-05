@@ -4,6 +4,8 @@
 #' @param rawcounts A raw count data matrix: row:genes, column:cells
 #' @param cls Identified disconnected clusters
 #'
+#' @importFrom limma makeContrasts 
+#' @importFrom edgeR DGEList calcNormFactors estimateDisp glmFit glmLRT topTags
 #' @importFrom shinyjs show
 #' @importFrom stats lag filter
 #' @import magrittr
