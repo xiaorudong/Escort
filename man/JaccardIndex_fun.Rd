@@ -4,14 +4,12 @@
 \alias{JaccardIndex_fun}
 \title{Jaccard Index of cells}
 \usage{
-JaccardIndex_fun(w_vec, b_vec, plot = F)
+JaccardIndex_fun(w_vec, b_vec)
 }
 \arguments{
 \item{w_vec}{A distance vector containing cell-to-cell distances within clusters}
 
 \item{b_vec}{A distance vector containing cell-to-cell distances between clusters}
-
-\item{plot}{a logical parameter. If left NULL, the defaul setting is FALSE and no plot will be printed.}
 }
 \value{
 A list containing the Jaccard Index between cells
