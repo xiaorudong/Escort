@@ -99,24 +99,27 @@ ui <- dashboardPage(
 
               fluidRow(
                 column(width = 6,
-                       box(width=NULL, status = "primary", title = strong("Step 1: Detecting trajectory existence"),
-                           "In the first step of Escort, evidence of a trajectory signal is assessed in two scenarios: ",
+                       box(width=NULL, status = "primary", title = strong("Step 1: Detecting existence of a trajectory signal"),
+                           "Before fitting a trajectory, Escort determines whether a given dataset is appropriate for trajectory
+                            analysis. There are two common scenarios that may render trajectory analysis inappropriate or require 
+                            more careful consideration: ",
                            br(),
-                           " - Dataset contains distinct cell types",  br(),
-                           " - Cells are too homogeneous",
-                           br(),
-                           br(),
-                           "If the distinct cell type module fails, additional information about cluster-specific differentially expressed genes is provided. Users should examine
-                           whether fitting a trajectory that connects these cell types is biologically reasonable. If so, then users should re-examine whether intermediate cell types
-                           exist, presence of batch effects, and choice of normalization method.",
+                           " - Datasets that contain distinct/disjoint cell types",  br(),
+                           " - Datasets in which the cells are too homogeneous/similar",
                            br(),
                            br(),
-                           "If the homogenous cells module fails, the top highly variable genes are shown along with their enrichments. Again, the appropriateness of an underlying trajectory should
-                           be considered. To proceed, users should investigate whether other processes could be overriding the biological signal of interest (e.g. cell cycle) or excessive
-                            signal from ribosomal or mitochondrial genes.")),
+                           "Disjoint cell types evaluation: If this module fails, Escort will perform cluster-specific differential expression testing and display the top cluster-specific 
+                           genes. Users should further examine this list to determine whether fitting a trajectory that connects these particular cell types is biologically reasonable. 
+                           If so, then users should re-examine whether sufficient intermediate cells exist between these two groups, or whether batch effects have been exist and have been addressed.",
+                           br(),
+                           br(),
+                           "Homogenous cells evaluation: If this module fails, Escort will report the top highly variable genes in the dataset along with their enrichments. 
+                           Users should further examine this list to re-examine whether an underlying trajectory is appropriate. If so, then this output should be used to identify what 
+                           other biological processes may be overriding or diluting the biological signal of interest (e.g. cell cycle) or excessive signal from ribosomal or mitochondrial genes.")),
                   column(width=6,
                          h4(strong("Upload scRNA-seq datasets:")),
-                         "Note: please upload .csv files or .rds files for raw data and normalized data.",
+                         "Please upload either .csv files or .rds files for both raw data and normalized data. More information on how to prepare these files from a Seurat object or SingleCellExperiment
+                         is provided xxHERExx. ",
                          fluidRow(
                            column(width = 6,
                                 br(),
@@ -124,16 +127,15 @@ ui <- dashboardPage(
                                 br(),
                                 br(),
                                 # read raw data after QC
-                                fileInput("rawfile", label = "Raw Data", buttonLabel = "Upload", accept = c(".csv", ".rds")),
+                                fileInput("rawfile", label = "Raw Data", buttonLabel = "File", accept = c(".csv", ".rds")),
                                 # read norm data after QC
-                                fileInput("normfile", label = "Norm Data", buttonLabel = "Upload", accept = c(".csv", "rds")),
-                                actionButton("upload", "Import"),
+                                fileInput("normfile", label = "Normalized Data", buttonLabel = "File", accept = c(".csv", "rds")),
+                                actionButton("upload", "Upload"),
                                 actionButton('reset', 'Clear'),#Clear input dataset#
                                 hr(),
                                 textOutput(outputId = "uploadnote"),
-                                hr(),
-                                hr(),
-                                downloadButton("downloadStep1Results", "Download Step 1 Results"),),
+                                hr()
+                                ),
                          column(width = 6,
                                 br(),
                                 # h4(strong("Data Info:")),
@@ -142,11 +144,11 @@ ui <- dashboardPage(
                 fluidRow(
                   column(width = 6,
                   tabBox(
-                  title = "Distinct cell types", width = NULL, id = "dc",
-                  tabPanel("About", strong("Diverse cell types detected?"), textOutput(outputId = "step1_dc")),
+                  title = "", width = NULL, id = "dc",
+                  tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc")),
                   tabPanel("DE", DT::DTOutput(outputId  = "dc_de_tb")%>% withSpinner(color="#FAD02C"))),
                   tabBox(
-                  title = "Homogeneous cells", width = NULL, id = "homo",
+                  title = "", width = NULL, id = "homo",
                   tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous")),
                   tabPanel("HVGs", DT::DTOutput(outputId  = "homo_hvgs_tb")%>% withSpinner(color="#FAD02C")),
                   tabPanel("GO",
@@ -157,8 +159,13 @@ ui <- dashboardPage(
                            DT::DTOutput(outputId  = "homo_go_tb")%>% withSpinner(color="#FAD02C")))),
                   column(width = 6,
                          box(width=NULL, status = "warning",
-                    span(textOutput(outputId = "step1_decision"), style = "font-size:20px; font-style:bold; text-align:center"),
-                    plotOutput("step1_plot", height = "260px", width="550px")%>% withSpinner(color="#FAD02C")))
+                    span(uiOutput(outputId = "step1_decision"), style = "font-size:18px; font-style:bold; text-align:left"),
+                    hr(),
+                    downloadButton("downloadStep1Results", "Download Step 1 Results"),
+                    hr(),
+                    ### XXXXX SHYAM: Add a button here that takes you to the Generate Embeddings tab XXXXX
+                    # plotOutput("step1_plot", height = "260px", width="550px")%>% withSpinner(color="#FAD02C")
+                    ))
 
 )),
 

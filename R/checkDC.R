@@ -356,7 +356,7 @@ JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
     BIN <- pmax(50, (length(b_vec))/length(unique(b_vec)))
     temp1 <- capture.output(db <- ash::ash1(ash::bin1(b_vec, ab=c(lower, upper), nbin = BIN)))
     
-    d <- data.frame(x=dw$x, a=dw$y, b=db$y)
+    denplot <- data.frame(x=dw$x, a=dw$y, b=db$y)
     if (plot) {
       plot(dw, main="overlaid density plots")
       lines(db, col="blue")
@@ -368,14 +368,19 @@ JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
     d$w <- pmin(d$a, d$b)
 
     # integrate areas under curves
-    total <- sfsmisc::integrate.xy(d$x, d$a) + sfsmisc::integrate.xy(d$x, d$b)
-    intersection <- sfsmisc::integrate.xy(d$x, d$w)
+    total <- intfunc(d$x, d$a)$value + intfunc(d$x, d$b)$value
+    intersection <- intfunc(d$x, d$w)$value
 
     # compute overlap coefficient
     JaccardIndex <- intersection/(total-intersection)
     JaccardIndex_op <- ifelse(dw$x[which.max(dw$y)]<=db$x[which.max(db$y)], JaccardIndex, -1*JaccardIndex)
   }
   return(list(JaccardIndex=JaccardIndex, signJaccardIndex=JaccardIndex_op))
+}
+
+
+intfunc <- function(y,z){
+  return(integrate(function(x) approx(y, z, xout = x)$y, min(y), max(y)))
 }
 
 

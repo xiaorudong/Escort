@@ -7,6 +7,7 @@
 #' @importFrom shinyjs show
 #' @importFrom stats lag filter
 #' @import magrittr
+#' @importFrom dplyr mutate across
 #' @export
 
 DE_edgeR <- function(rawcounts, cls) {
@@ -44,7 +45,7 @@ DE_edgeR <- function(rawcounts, cls) {
   de_df <- do.call("rbind", de_ls)
   de_df <- de_df %>%
     mutate(across(2:5, round, 3)) %>%
-    mutate(across(2:5, function(x) ifelse(x<0.001, "<0.0005", x)))
+    mutate(across(2:5, function(x) ifelse(x<0.001, "<0.001", x)))
 
   return(de_df)
 }
@@ -58,29 +59,34 @@ DE_edgeR <- function(rawcounts, cls) {
 #'
 #' @importFrom  stats lag filter
 #' @import magrittr
+#' @importFrom dplyr mutate across
+#' @import clusterProfiler
 #' @export
 
-HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
-  gene.var <- Escort::quick_model_gene_var(normcounts)
-  HVGs <- rownames(subset(gene.var, FDR < 0.05))
+HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db", geneVar=NULL) {
+  if(is.null(geneVar)) {
+    geneVar <- Escort::quick_model_gene_var(normcounts)
+  } 
+  HVGs <- rownames(subset(geneVar, FDR < 0.05))
 
-  ego <- enrichGO(gene = HVGs, OrgDb = OrgDb, ont = "ALL", keyType = "GENENAME")
+  ego <- clusterProfiler::enrichGO(gene = HVGs, OrgDb = OrgDb, ont = "ALL", keyType = "SYMBOL")
   if (is.null(ego)) {
     return(NULL)
   }
 
-  if (! is.null(ego)){
-    df <- ego@result[, c(1, 3 ,6, 7, 10, 9)]
+  if (!is.null(ego)){
+    df <- ego@result[, c(1, 3 , 4, 6, 7)]
+    head(df)
     df <- as.data.frame(df) %>%
-      mutate(across(3:4, round, 3)) %>%
-      mutate(across(3:4, function(x) ifelse(x<0.001, "<0.0005", x)))
-
-    colnames(df)[1] <- "ont"
-    colnames(df)[4] <- "p.adj"
-    colnames(df)[5] <- "N"
+      dplyr::mutate(across(4:5, round, 3)) %>%
+      dplyr::mutate(across(4:5, function(x) ifelse(x<0.001, "<0.001", x)))
+    head(df)
+    colnames(df)[1] <- "OntologyType"
+    colnames(df)[4] <- "Pval"
+    colnames(df)[5] <- "AdjPval"
 
     return(df)
-  }
+  } 
 }
 
 
@@ -93,14 +99,16 @@ HVGs_GO <- function(normcounts, OrgDb="org.Hs.eg.db") {
 #'
 #' @importFrom  stats lag filter
 #' @import magrittr
+#' @importFrom dplyr mutate across
 #' @export
 
 HVGs_quick <- function(normcounts) {
   gene.var <- Escort::quick_model_gene_var(normcounts)
 
-  df <- as.data.frame(gene.var) %>%
-    mutate(across(1:6, round, 3)) %>%
-    mutate(across(5:6, function(x) ifelse(x<0.001, "<0.0005", x)))
+  df <- as.data.frame(gene.var)
+  df <- df[order(df$FDR, df$mean),]
+  df <- df %>% dplyr::mutate(across(1:6, round, 3)) %>%
+    dplyr::mutate(across(5:6, function(x) ifelse(x<0.001, "<0.001", x)))
 
   return(df)
 }
