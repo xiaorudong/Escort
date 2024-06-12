@@ -299,11 +299,11 @@ BWClusters <- function(dist_mat, c_cl) {
       Dists_B_cells <- Dists_B[[paste("Group", i, sep="_")]][[gp1]]
       JaccardIndex_vec <- c()
       JaccardIndex_op_vec <- c()
-      for (c in 1:length(Dists_B_cells)) {
-        w_vec <- Dists_W_cells[[c]]
-        b_vec <- Dists_B_cells[[c]]
+      for (xx in 1:length(Dists_B_cells)) {
+        w_vec <- Dists_W_cells[[xx]]
+        b_vec <- Dists_B_cells[[xx]]
 
-        Jaccard <- Escort::JaccardIndex_fun(w_vec, b_vec, plot=F)
+        Jaccard <- Escort::JaccardIndex_fun(w_vec, b_vec)
         JaccardIndex_vec <- c(JaccardIndex_vec, Jaccard$JaccardIndex)
         JaccardIndex_op_vec <- c(JaccardIndex_op_vec, Jaccard$signJaccardIndex)
       }
@@ -328,7 +328,6 @@ BWClusters <- function(dist_mat, c_cl) {
 #'
 #' @param w_vec A distance vector containing cell-to-cell distances within clusters
 #' @param b_vec A distance vector containing cell-to-cell distances between clusters
-#' @param plot a logical parameter. If left NULL, the defaul setting is FALSE and no plot will be printed.
 #'
 #' @importFrom sfsmisc integrate.xy
 #'
@@ -337,9 +336,11 @@ BWClusters <- function(dist_mat, c_cl) {
 #'   \item JaccardIndex - The Jaccard Index between cells
 #'   \item signJaccardIndex - Edited Jaccard Index. The negative sign is added to show the cell is very close to other clusters.
 #' }
+#' @importFrom ash ash1 bin1
+#' @importFrom pracma trapz
 #' @export
 
-JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
+JaccardIndex_fun <- function(w_vec, b_vec) {
 
   lower <- min(c(w_vec, b_vec)) - 0.2
   upper <- max(c(w_vec, b_vec)) + 0.2
@@ -349,26 +350,24 @@ JaccardIndex_fun <- function(w_vec, b_vec, plot=F) {
     JaccardIndex_op=0
   } else {
     # generate kernel densities
-    dw <- density(w_vec, from=lower, to=upper)
-    db <- density(b_vec, from=lower, to=upper)
-    d <- data.frame(x=dw$x, a=dw$y, b=db$y)
-    if (plot) {
-      plot(dw, main="overlaid density plots")
-      lines(db, col="blue")
-      legend("topleft", legend=c(deparse(substitute(w_vec)), deparse(substitute(b_vec))),
-             col=c("black", "blue"), lty=1:1, cex=0.5)
-    }
+    BIN <- pmax(50, (length(w_vec))/length(unique(w_vec)))
+    temp1 <- capture.output(dist.within <- ash::ash1(ash::bin1(w_vec, ab=c(lower, upper), nbin = BIN)))
+    
+    BIN <- pmax(50, (length(b_vec))/length(unique(b_vec)))
+    temp1 <- capture.output(dist.between <- ash::ash1(ash::bin1(b_vec, ab=c(lower, upper), nbin = BIN)))
+    
+    alldens <- data.frame(xvals=dist.within$x, within=dist.within$y, between=dist.between$y)
 
     # calculate intersection densities
-    d$w <- pmin(d$a, d$b)
-
+    alldens$overlap <- pmin(alldens$within, alldens$between)
+  
     # integrate areas under curves
-    total <- sfsmisc::integrate.xy(d$x, d$a) + sfsmisc::integrate.xy(d$x, d$b)
-    intersection <- sfsmisc::integrate.xy(d$x, d$w)
+    total <- pracma::trapz(alldens$xvals, alldens$within) + pracma::trapz(alldens$xvals, alldens$between)
+    intersection <- pracma::trapz(alldens$xvals, alldens$overlap)
 
     # compute overlap coefficient
     JaccardIndex <- intersection/(total-intersection)
-    JaccardIndex_op <- ifelse(dw$x[which.max(dw$y)]<=db$x[which.max(db$y)], JaccardIndex, -1*JaccardIndex)
+    JaccardIndex_op <- ifelse(dist.within$x[which.max(dist.within$y)]<=dist.between$x[which.max(dist.between$y)], JaccardIndex, -1*JaccardIndex)
   }
   return(list(JaccardIndex=JaccardIndex, signJaccardIndex=JaccardIndex_op))
 }

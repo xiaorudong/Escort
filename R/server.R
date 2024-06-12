@@ -138,7 +138,12 @@ server <- function(input, output) {
   
 
 
-  # Test DC in HighDim:
+  ############################################################################################
+  ############################################################################################
+  # Test DC on High Dimensional Dataset:
+  ############################################################################################
+  ############################################################################################
+
   step1_test2 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
@@ -151,10 +156,10 @@ server <- function(input, output) {
   output$step1_dc <- renderText({
     if(!mydf$from & is.null(step1_test2())) return(NULL)
     ifelse(step1_test2()$ifConnected,
-           "No. We didn't detect disconnected clusters.",
-           "Yes. Upon detecting disconnected clusters, it signified the presence of diverse cell types,
-           making trajectory fitting inappropriate. To aid in defining these diverse cell types,
-           we present the results of the differential expression (DE) analysis between clusters.")
+           "No. Escort did not detect any disconnected clusters.",
+           "Yes. The detection of disconnected clusters may indicate the presence of disjoint cell types,
+           rendering trajectory fitting inappropriate. To further assess, the the results of 
+           differential expression (DE) analysis between clusters is provided here and for download.")
   })
   
   #save the result from step 1:
@@ -188,26 +193,28 @@ server <- function(input, output) {
       DT::formatStyle(names(step1_de()),lineHeight='80%')
   })
 
-
+  ############################################################################################
+  ############################################################################################
   # Test Homogeneous:
+  ############################################################################################
+  ############################################################################################
+
   step1_test1 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
     Escort::step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)
   })
   
- 
-
   output$step1_homogeneous <- renderText({
     if(!mydf$from) return(NULL)
     ifelse(step1_test1()$signal_pct>=0.46,
-           "No. We could detect the trajectory signal.",
-           "Yes. In the absence of a detected trajectory signal, it suggested the presence of a homogeneous dataset,
-           rendering trajectory fitting inappropriate. To support this assessment, we present the results of
-           highly variable genes (HVGs) analysis and GO Enrichment Analysis focusing on cell cycle.")
+           "No. Escort has detected a trajectory signal in your data!",
+           "Yes. In the absence of a detected trajectory signal, Escort's finds the dataset to be too homogeneous,
+           rendering trajectory analysis inappropriate. To further investigate this assessment, the most
+           highly variable genes (HVGs) in the dataset and GO Enrichment Analysis are provided here and for download.")
   })
 
-  # HVGs in Homogeneous cells:
+  # HVGs:
   step1_hvgs <- reactive({
     if(step1_test1()$signal_pct<0.46) {
       norm_mat <- mydf$norm
@@ -229,7 +236,7 @@ server <- function(input, output) {
     if(is.null(input$go_info)) return(NULL)
     if(step1_test1()$signal_pct<0.46) {
       norm_mat <- mydf$norm
-      df <- Escort::HVGs_GO(normcounts=norm_mat, OrgDb = input$go_info)
+      df <- Escort::HVGs_GO(normcounts=norm_mat, OrgDb = input$go_info, geneVar=step1_hvgs())
       return(df)
     }
   })
@@ -238,7 +245,6 @@ server <- function(input, output) {
     if(!mydf$from) return(NULL)
     if(is.null(step1_test1())) return(NULL)
     if(step1_test1()$signal_pct>=0.46) return(NULL)
-    if(is.null(step1_go())) return("There are no genes overlapping Gene Ontology (GO) sets.")
   })
 
   output$homo_go_tb <- DT::renderDT({
@@ -246,12 +252,16 @@ server <- function(input, output) {
     if(is.null(step1_test1())) return(NULL)
     if(step1_test1()$signal_pct>=0.46) return(NULL)
     if(is.null(step1_go())) return(NULL)
-    DT::datatable(step1_go(),rownames = TRUE, filter = 'top',
+      printab <- step1_go()
+   
+    DT::datatable(printab,rownames = TRUE, filter = 'top',
               options = list(
                 autoWidth = TRUE,scrollX=TRUE,
                 columnDefs = list(list(width = '400px', targets = c(2)),
                                   list(visible=FALSE, targets=c(6)))))%>%
       DT::formatStyle(names(step1_de()),lineHeight='80%')
+      
+   
   })
 
 
@@ -264,41 +274,44 @@ server <- function(input, output) {
  
   
 
-  output$step1_decision <- renderText({
+  output$step1_decision <- renderUI({
     if(!mydf$from) return(NULL)
     if(step1_res()) {
-      "Go to STEP 2"
+     return(HTML("Escort has detected a trajectory signal! <br><br>
+               Now, download the Step 1 results to reuse in the future, allowing you to jump directly to Step 2. <br> <br>
+      The Generate Embeddings tab will assist you in generating various embeddings of your data. Escort will then evaluate the embeddings
+      and determine which ones are recomended for analyzing your data."))
     } else {
-      "Not suitable for trajectory fitting. Check results in the left column. "
+     return(HTML("Escort was unable detect a trajectory signal. <br> 
+      Please review the evaluations shown to the left and re-assess whether trajectory analysis is appropriate for your dataset."))
     }
 
   })
 
-
   # Visualization
-  output$step1_plot <- renderPlot({
-    if(!mydf$from & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
-    norm_mat <- mydf$norm
-    raw_mat <- mydf$raw
-    # Visualization
-    K <- step1_test2()$K
-    par(mfrow=c(1,2))
-    # library(umap)
-    plotcol <- as.factor(step1_test2()$Clusters)
-    dimred_umap <- Escort::getDR_2D(norm_mat, "UMAP")
-    # dimred_umap <- umap::umap(t(norm_mat))$layout
-    # library(Rtsne)
-    dimred_tsne <- Escort::getDR_2D(norm_mat, "TSNE")
-    # dimred_tsne <- Rtsne::Rtsne(t(norm_mat), dims = 2)$Y
-    # rownames(dimred_tsne) <- rownames(t(norm_mat))
-
-    Sys.sleep(1)
-    plot(dimred_umap, col = alpha(plotcol,0.7), pch=16, main="UMAP")
-    legend("topright", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
-    plot(dimred_tsne, col = alpha(plotcol,0.7), pch=16, main="TSNE")
-    legend("topleft", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
-
-  })
+  # output$step1_plot <- renderPlot({
+  #   if(!mydf$from & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
+  #   norm_mat <- mydf$norm
+  #   raw_mat <- mydf$raw
+  #   # Visualization
+  #   K <- step1_test2()$K
+  #   par(mfrow=c(1,2))
+  #   # library(umap)
+  #   plotcol <- as.factor(step1_test2()$Clusters)
+  #   dimred_umap <- Escort::getDR_2D(norm_mat, "UMAP")
+  #   # dimred_umap <- umap::umap(t(norm_mat))$layout
+  #   # library(Rtsne)
+  #   dimred_tsne <- Escort::getDR_2D(norm_mat, "TSNE")
+  #   # dimred_tsne <- Rtsne::Rtsne(t(norm_mat), dims = 2)$Y
+  #   # rownames(dimred_tsne) <- rownames(t(norm_mat))
+  #
+  #   Sys.sleep(1)
+  #   plot(dimred_umap, col = scales::alpha(plotcol,0.7), pch=16, main="UMAP")
+  #   legend("topright", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
+  #   plot(dimred_tsne, col = scales::alpha(plotcol,0.7), pch=16, main="TSNE")
+  #   legend("topleft", legend=as.character(1:K), col=c(1:K), pch=16, cex = 0.5)
+  #
+  # })
   
   
   #optional for uploading norm data in embedding
