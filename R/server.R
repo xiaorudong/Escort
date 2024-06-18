@@ -1,4 +1,4 @@
-server <- function(input, output) {
+server <- function(input, output, session) {
   # # add image:
   # output$home_img <- renderImage({
   #
@@ -84,6 +84,11 @@ server <- function(input, output) {
       
 			showNotification("Example data is loading. Please wait.", type="default", duration=8)
 		})
+  })
+
+  #go to generate embeddings tab on click of the go to generate embeddings button
+  observeEvent(input$go_to_generate_embeddings, {
+    updateTabItems(session, "tabs", "generate_embeddings")
   })
 
   ### clear button
