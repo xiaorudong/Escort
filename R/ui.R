@@ -49,6 +49,14 @@ ui <- dashboardPage(
         background-color: #005a90;
         color: #ffffff;
       }
+      .download_step_1_button:active {
+        background-color: #005a90 !important;
+        color: #ffffff !important;
+      }
+      .download_step_1_button:focus {
+        background-color: #0073b7;
+        color: #ffffff;
+      }
     "))),
     tags$head(tags$style("
    body {
@@ -90,12 +98,14 @@ ui <- dashboardPage(
             br(),
             "For any questions or issues, please submit a comment to our ", a(
               href = "https://github.com/xiaorudong/Escort/issues",
+              target = "_blank",
               "GitHub issues page"
             ), ".",
             br(),
             br(),
             "Additional explanations are provided in our vignette for ", a(
-              href = "https://www.rhondabacher.com/docs-escort/shiny_vignette.html",
+              href = "https://rbacher.rc.ufl.edu/escort/docs-escort/vignettes.html",
+              target = "_blank",
               "shinyEscort"
             ), "."
           )
@@ -126,43 +136,7 @@ ui <- dashboardPage(
               "Homogenous cells evaluation: If this module fails, Escort will report the top highly variable genes in the dataset along with their enrichments.
                            Users should further examine this list to re-examine whether an underlying trajectory is appropriate. If so, then this output should be used to identify what
                            other biological processes may be overriding or diluting the biological signal of interest (e.g. cell cycle) or excessive signal from ribosomal or mitochondrial genes."
-            )
-          ),
-          column(
-            width = 6,
-            h4(strong("Upload scRNA-seq datasets:")),
-            "Please upload either .csv files or .rds files for both raw data and normalized data. More information on how to prepare these files from a Seurat object or SingleCellExperiment
-                         is provided xxHERExx. ",
-            fluidRow(
-              column(
-                width = 6,
-                br(),
-                actionButton("upload_example_data", label = "Load Example Data"),
-                br(),
-                br(),
-                # read raw data after QC
-                fileInput("rawfile", label = "Raw Data", buttonLabel = "File", accept = c(".csv", ".rds")),
-                # read norm data after QC
-                fileInput("normfile", label = "Normalized Data", buttonLabel = "File", accept = c(".csv", "rds")),
-                actionButton("upload", "Upload"),
-                actionButton("reset", "Clear"), # Clear input dataset#
-                hr(),
-                textOutput(outputId = "uploadnote"),
-                hr()
-              ),
-              column(
-                width = 6,
-                br(),
-                # h4(strong("Data Info:")),
-                valueBoxOutput("no_cells", width = NULL),
-                valueBoxOutput("no_genes", width = NULL)
-              )
-            )
-          )
-        ),
-        fluidRow(
-          column(
-            width = 6,
+            ),
             tabBox(
               title = "", width = NULL, id = "dc",
               tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc")),
@@ -185,18 +159,54 @@ ui <- dashboardPage(
           ),
           column(
             width = 6,
-            box(
-              width = NULL, status = "warning",
-              span(uiOutput(outputId = "step1_decision"), style = "font-size:18px; font-style:bold; text-align:left"),
-              hr(),
-              downloadButton("downloadStep1Results", "Download Step 1 Results", class = "download_step_1_button"),
-              hr(),
-              actionButton("go_to_generate_embeddings", label = "Go to next step"),
-              ### XXXXX SHYAM: Add a button here that takes you to the Generate Embeddings tab XXXXX
-              # plotOutput("step1_plot", height = "260px", width="550px")%>% withSpinner(color="#FAD02C")
+            h4(strong("Upload scRNA-seq datasets:")),
+            "Please upload either .csv files or .rds files for both raw data and normalized data. More information on how to prepare these files from a Seurat object or SingleCellExperiment is provided",
+            a(
+              href = "https://rbacher.rc.ufl.edu/escort/docs-escort/vignettes.html",
+              target = "_blank",
+              "here."
+            ),
+            fluidRow(
+              column(
+                width = 6,
+                br(),
+                actionButton("upload_example_data", label = "Load Example Data"),
+                br(),
+                br(),
+                # read raw data after QC
+                fileInput("rawfile", label = "Raw Data", buttonLabel = "File", accept = c(".csv", ".rds")),
+                # read norm data after QC
+                fileInput("normfile", label = "Normalized Data", buttonLabel = "File", accept = c(".csv", "rds")),
+                actionButton("upload", "Upload"),
+                actionButton("reset", "Clear"), # Clear input dataset#
+                br(),
+                br(),
+                textOutput(outputId = "uploadnote"),
+              ),
+              column(
+                width = 6,
+                br(),
+                # h4(strong("Data Info:")),
+                valueBoxOutput("no_cells", width = NULL),
+                valueBoxOutput("no_genes", width = NULL)
+              )
+            ),
+            fluidRow(
+              column(
+                width = 12,
+                br(),
+                box(
+                  width = NULL, status = "warning",
+                  span(uiOutput(outputId = "step1_decision"), style = "font-size:18px; font-style:bold; text-align:left"),
+                  hr(),
+                  downloadButton("downloadStep1Results", "Download Step 1 Results", class = "download_step_1_button"),
+                  hr(),
+                  actionButton("go_to_generate_embeddings", label = "Go to next step"),
+                )
+              )
             )
           )
-        )
+        ),
       ),
       tabItem(
         tabName = "generate_embeddings",
@@ -206,7 +216,8 @@ ui <- dashboardPage(
             h4(strong("Generate embeddings:")),
             "Embeddings can be generated invidivually here (in combination with the preferred trajectory method used in Step 3), or users can generate
                       their own embeddings following the workflow in the ", a(
-              href = "https://www.rhondabacher.com/docs-escort/generate_embedding_objects_vignette.html",
+              href = "https://rbacher.rc.ufl.edu/escort/docs-escort/generate_embedding_objects_vignette.html",
+              target = "_blank",
               "Generating data objects for Escort R/Shiny Vignette"
             ), ".",
             numericInput("checkgenes", "The number of selected HVGs", value = 100, min = 0),

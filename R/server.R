@@ -153,7 +153,10 @@ server <- function(input, output, session) {
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
     raw_mat <- mydf$raw
-    Escort::HD_DCClusterscheck(normcounts=norm_mat, rawcounts=raw_mat, clust.max = 5)
+    withProgress(message = "Testing for disconnected clusters", value = 0.5, {
+      return(Escort::HD_DCClusterscheck(normcounts=norm_mat, rawcounts=raw_mat, clust.max = 5))
+      incProgress(1)
+    })
   })
   
  
@@ -207,7 +210,7 @@ server <- function(input, output, session) {
   step1_test1 <- reactive({
     if(!mydf$from) return(NULL)
     norm_mat <- mydf$norm
-    Escort::step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)
+    Escort::step1_testHomogeneous(normcounts=norm_mat, num.sim = 1000)  
   })
   
   output$step1_homogeneous <- renderText({
