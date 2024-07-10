@@ -139,12 +139,12 @@ ui <- dashboardPage(
             ),
             tabBox(
               title = "", width = NULL, id = "dc",
-              tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc")),
+              tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc"), hr(), downloadButton("downloadStep1de", "Download DE", class = "download_step_1_button"), ),
               tabPanel("DE", DT::DTOutput(outputId = "dc_de_tb") %>% withSpinner(color = "#FAD02C"))
             ),
             tabBox(
               title = "", width = NULL, id = "homo",
-              tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous")),
+              tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous"), hr(), downloadButton("downloadStep1hvg", "Download HVG", class = "download_step_1_button"), downloadButton("downloadStep1go", "Download GO", class = "download_step_1_button")),
               tabPanel("HVGs", DT::DTOutput(outputId = "homo_hvgs_tb") %>% withSpinner(color = "#FAD02C")),
               tabPanel(
                 "GO",
