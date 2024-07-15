@@ -209,21 +209,21 @@ server <- function(input, output, session) {
 
   output$downloadStep1hvg <- downloadHandler(
     filename = function() {
-      paste("step_1_HVG", Sys.Date(), ".rds", sep = "")
+      paste("step_1_HVG", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
       req(step1_hvgs())
-      saveRDS(step1_hvgs(), file)
+      write.csv(step1_hvgs(), file)
     }
   )
 
   output$downloadStep1go <- downloadHandler(
     filename = function() {
-      paste("step_1_GO", Sys.Date(), ".rds", sep = "")
+      paste("step_1_GO", Sys.Date(), ".csv", sep = "")
     },
     content = function(file) {
       req(step1_go())
-      saveRDS(step1_go(), file)
+      write.csv(step1_go(), file)
     }
   )
 
@@ -331,7 +331,7 @@ server <- function(input, output, session) {
     }
     ifelse(step1_test1()$signal_pct >= 0.46,
       "No. Escort has detected a trajectory signal in your data!",
-      "Yes. In the absence of a detected trajectory signal, Escort's finds the dataset to be too homogeneous,
+      "Yes. In the absence of a detected trajectory signal, Escort finds the dataset to be too homogeneous,
            rendering trajectory analysis inappropriate. To further investigate this assessment, the most
            highly variable genes (HVGs) in the dataset and GO Enrichment Analysis are provided here and for download."
     )

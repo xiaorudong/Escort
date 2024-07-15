@@ -21,6 +21,8 @@ First, we will make use of the sample dataset provided in the package.
 ```{r, eval=FALSE}
 library(Escort)
 data("step0_clean_dyntoy_L3")
+df <- Escort::HVGs_quick(normcounts = norm_counts)
+
 ```
 
 For this example, we generate an embedding that consists of using 2,000 highly variable genes and using PCA as the dimension reduction.
