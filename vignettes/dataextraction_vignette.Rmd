@@ -1,0 +1,73 @@
+---
+title: "Preparing single-cell RNA-seq datasets for Escort"
+author: "Xiaoru Dong and Rhonda Bacher"
+output: 
+  BiocStyle::html_document:
+    toc: false
+fontsize: 13pt
+vignette: >
+  %\VignetteIndexEntry{Preparing Datasets}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+---
+
+```{r set-options, echo=FALSE, cache=FALSE}
+options(width = 1000)
+```
+
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      eval=FALSE,
+                      warning = FALSE, 
+                      error = FALSE)
+```
+
+# Introduction
+
+In this tutorial, we demonstrate how to extract both raw and normalized single-cell RNA sequencing (scRNA-seq) datasets from Seurat and SingleCellExperiment objects. These objects are widely used containers for conducting scRNA-seq analysis.
+
+Many tutorials provide guidance on how to use these frameworks for data cleaning, such as the [Seurat tutorial](https://satijalab.org/seurat/articles/pbmc3k_tutorial) and the [SingleCellExperiment tutorial](https://www.singlecellcourse.org/basic-quality-control-qc-and-exploration-of-scrna-seq-datasets.html)..
+
+Our focus here will be on retrieving raw and normalized scRNA-seq datasets that have been stored in these objects as they are required for the first step of `Escort`.
+
+
+# Seurat
+
+For scRNA-seq data processed using Seurat, the raw and normalized data are stored in a Seurat object and can be extracted as follows:
+
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(Seurat)
+# Extract Raw and Normalized
+rawcounts <- as.matrix(seuratobj@assays$RNA$counts)
+norm_counts <- as.matrix(seuratobj@assays$RNA$data)
+
+# Save locally:
+setwd("path/to/your_file")
+write.csv(rawcounts, file = "filename_rawcount.csv")
+write.csv(norm_counts, file = "filename_normcount.csv")
+```
+
+
+
+# SingleCellExperiment
+
+For scRNA-seq data processed using and stored in an SingleCellExperiment object, the raw and normalized data can be extracted by:
+
+```{r, warning=FALSE, error=FALSE, message=FALSE}
+library(SingleCellExperiment)
+# Extract Raw and Normalized
+rawcounts <- as.matrix(sceobj@assays$counts)
+norm_counts <- as.matrix(sceobj@assays$logcounts)
+
+setwd("path/to/your_file")
+write.csv(rawcounts, file = "filename_rawcount.csv")
+write.csv(norm_counts, file = "filename_normcount.csv")
+```
+
+# Contact
+
+For any additional questions or issues at this step, please do not hesitate to reach out to us at [https://github.com/xiaorudong/Escort/issues](https://github.com/xiaorudong/Escort/issues)
+
+
