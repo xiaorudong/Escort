@@ -34,8 +34,12 @@ step1_testHomogeneous <- function(normcounts, HVGs=NULL, g=100, num.sim = 20000)
   comb_df <- cbind(time_df, t(normcounts[HVGs,]))
   comb_df <- comb_df[order(comb_df$PT),]
 
-  p_vec_perm <- apply(comb_df[,3:ncol(comb_df)], 2,
+  withProgress(message = "Testing for homogeneous cells", value = 0, {
+    incProgress(1/2)
+    p_vec_perm <- apply(comb_df[,3:ncol(comb_df)], 2,
                       function(x) jmuOutlier::perm.cor.test(comb_df[,2], x, method = "spearman", num.sim = num.sim)$p.value)
+    incProgress(1)
+  })
   padj <- p.adjust(p_vec_perm, method = "fdr")
   # res_perm_p <- mean(p_vec_perm<0.05)
   res_perm_padj <- mean(padj<0.05)

@@ -32,7 +32,6 @@ shinyEscort <- function(port = 19901, is_local_development = TRUE) {
   if (is_local_development == FALSE) {
     options_args$shiny.host <- "0.0.0.0"
   }
-  print(options_args)
   do.call(options, options_args)
   library(Escort)
   shinyApp(ui, server)
