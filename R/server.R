@@ -322,7 +322,11 @@ server <- function(input, output, session) {
       return(NULL)
     }
     norm_mat <- mydf$norm
-    Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000)
+    withProgress(message = "Testing for homogeneous cells", value = 0, {
+        incProgress(1/2)
+          Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000)
+        incProgress(1)
+      })
   })
 
   output$step1_homogeneous <- renderText({
