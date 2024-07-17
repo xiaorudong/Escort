@@ -76,18 +76,15 @@ server <- function(input, output, session) {
   ### load example data
   observeEvent(input$upload_example_data, {
     isolate({
-      raw_count_data_path <- system.file("data", "rawcount_linear_subdeg20.csv", package = "Escort")
-      rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
+    raw_count_data_path <- system.file("data", "rawcount_linear_subdeg20.csv", package = "Escort")
+    rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
 
-      norm_count_data_path <- system.file("data", "normcount_linear_subdeg20.csv", package = "Escort")
-      normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
+    norm_count_data_path <- system.file("data", "normcount_linear_subdeg20.csv", package = "Escort")
+    normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
 
-      as.matrix(rawcount_linear_splatter)
-      as.matrix(normcount_linear_splatter)
-
-      mydf$raw <- rawcount_linear_splatter
-      mydf$norm <- normcount_linear_splatter
-      mydf$from <- all(dim(rawcount_linear_splatter) == dim(normcount_linear_splatter))
+    mydf$raw <- rawcount_linear_splatter
+    mydf$norm <- normcount_linear_splatter
+    mydf$from <- all(dim(rawcount_linear_splatter) == dim(normcount_linear_splatter))
 
       showNotification("Example data is loading. Please wait.", type = "default", duration = 3)
     })
@@ -160,6 +157,7 @@ server <- function(input, output, session) {
   ############################################################################################
 
   step1_test2 <- reactive({
+ 
     if (!mydf$from) {
       return(NULL)
     }
@@ -318,13 +316,14 @@ server <- function(input, output, session) {
   ############################################################################################
 
   step1_test1 <- reactive({
+
     if (!mydf$from) {
       return(NULL)
     }
     norm_mat <- mydf$norm
     withProgress(message = "Testing for homogeneous cells", value = 0, {
         incProgress(1/2)
-          Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000)
+         return(Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000))
         incProgress(1)
       })
   })
