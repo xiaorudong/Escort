@@ -20,7 +20,7 @@ First, we will make use of the sample dataset provided in the package.
 ### Load Escort and sample data
 ```{r, eval=FALSE}
 library(Escort)
-data("step0_clean_dyntoy_L3")
+data("exampleData_linear")
 df <- Escort::HVGs_quick(normcounts = norm_counts)
 
 ```

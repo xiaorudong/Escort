@@ -68,7 +68,7 @@ Below we show an example using a simulated single-cell RNA-seq dataset from Sael
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 set.seed(11111)
 library(Escort)
-data("step0_clean_dyntoy_L3")
+data("exampleData_linear")
 ```
 
 Escort first assists users by determining the presence of a trajectory signal. This step provides information regarding the appropriateness of the dataset for trajectory analysis. Often trajectory analysis is not appropriate when cells represent distinct cell types or when cells are too homogeneous.
@@ -126,7 +126,7 @@ DRLvsC$DCcheck
 Next, Escort assesses the effectiveness of the embedding at preserving inter-cellular relationships that were present in the high-dimensional data using the `Similaritycheck()` function. The output percentage represents the rate at which cells in the embedding successfully maintain inter-cellular relationships. A higher percentage indicates a greater preservation of relationships among cells.
 
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
-simi_cells <- Similaritycheck(normcounts=norm_counts, dimred=embedding1, clusters=LvsC)
+simi_cells <- Similaritycheck(clusters=LvsC, dimred=embedding1)
 simi_cells$GoodRate
 ```
 

@@ -76,10 +76,10 @@ server <- function(input, output, session) {
   ### load example data
   observeEvent(input$upload_example_data, {
     isolate({
-      raw_count_data_path <- system.file("data", "rawcount_linear_splatter.csv", package = "Escort")
+      raw_count_data_path <- system.file("data", "rawcount_linear_subdeg20.csv", package = "Escort")
       rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
 
-      norm_count_data_path <- system.file("data", "normcount_linear_splatter.csv", package = "Escort")
+      norm_count_data_path <- system.file("data", "normcount_linear_subdeg20.csv", package = "Escort")
       normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
 
       as.matrix(rawcount_linear_splatter)

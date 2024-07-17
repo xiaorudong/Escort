@@ -51,7 +51,7 @@ For datasets demonstrating too little heterogeneity, a list of highly variable g
 
 #### Input:
 
-Custom embeddings for evaluation can be generated in this tab. For now, we offer the selection of a dimension reduction technique (UMAP, MDS, PCA, or TSNE) and the number of highly variable genes. By default, Escort utilizes Slingshot for the preliminary trajectory fitting that takes place in Step 3. Users may also generate their own embedding options and skip this tab. How do to so is described in the [Generating data objects for Escort R/Shiny Vignette.](https://www.rhondabacher.com/docs-escort/generate_embedding_objects_vignette.html)
+Custom embeddings for evaluation can be generated in this tab. For now, we offer the selection of a dimension reduction technique (UMAP, MDS, PCA, or TSNE) and the number of highly variable genes. By default, Escort utilizes Slingshot for the preliminary trajectory fitting that takes place in Step 3. Users may also generate their own embedding options and skip this tab. How do to so is described in the [GGenerating embeddings in R to use in the Shiny app.](https://rbacher.rc.ufl.edu/escort/docs-escort/vignettes.html)
 
 #### Output:
 

@@ -35,7 +35,7 @@ Below we show an example using a simulated single-cell RNA-seq dataset from Sael
 ```{r, warning=FALSE, error=FALSE, message=FALSE}
 library(Escort)
 set.seed(11111)
-data("step0_clean_dyntoy_L3")
+data("exampleData_linear")
 ```
 
 # Generating multiple embeddings
@@ -59,9 +59,9 @@ myembeds <- function(varyg, usedim) {
   return(embed_obj)
 }
 
-pca_embeds <- lapply(c(1000, 2000, 5000), myembeds, usedim="PCA")
-umap_embeds <- lapply(c(1000, 2000, 5000), myembeds, usedim="UMAP")
-mds_embeds <- lapply(c(1000, 2000, 5000), myembeds, usedim="MDS")
+pca_embeds <- lapply(c(100, 1000, 2000), myembeds, usedim="PCA")
+umap_embeds <- lapply(c(100, 1000, 2000), myembeds, usedim="UMAP")
+mds_embeds <- lapply(c(100, 1000, 2000), myembeds, usedim="MDS")
 
 embeddings <- c(pca_embeds, umap_embeds, mds_embeds)
 ```
@@ -88,7 +88,7 @@ sapply(DRLvsCs, function(x) x$DCcheck)
 LvsC <- HD_DCClusterscheck(normcounts=norm_counts, rawcounts=rawcounts)
 
 simi_cells <- mclapply(embeddings, function(x) {
-  Similaritycheck(normcounts=norm_counts, dimred=x$Embedding, clusters=LvsC)
+  Similaritycheck(dimred=x$Embedding, clusters=LvsC)
 }, mc.cores = n)
 sapply(simi_cells, function(x) x$GoodRate)
 ```
@@ -116,7 +116,7 @@ scoredf <- data.frame(DCcheck=sapply(DRLvsCs, function(x) x$ifConnected),
                       SimiRetain=sapply(simi_cells, function(x) x$GoodRate),
                       GOF=sapply(gof_evals, function(x) x$occupiedRate), 
                       USHAPE=sapply(ushap_evals, function(x) x$Ambpct))
-rownames(scoredf) <- c(paste(rep(c("PCA","UMAP","MDS"), each=3), rep(c(1000, 2000, 5000), 3)))
+rownames(scoredf) <- c(paste(rep(c("PCA","UMAP","MDS"), each=3), rep(c(100, 1000, 2000), 3)))
 calcScore(scoredf)
 ```
 
