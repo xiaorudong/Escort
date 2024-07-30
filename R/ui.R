@@ -40,20 +40,20 @@ ui <- dashboardPage(
         font-weight: bold;
         font-size: 24px;
       }
-      .download_step_1_button {
+      .button_blue {
         background-color: #0073b7;
         color: #ffffff;
         border: none;
       }
-      .download_step_1_button:hover {
+      .button_blue:hover {
         background-color: #005a90;
         color: #ffffff;
       }
-      .download_step_1_button:active {
+      .button_blue:active {
         background-color: #005a90 !important;
         color: #ffffff !important;
       }
-      .download_step_1_button:focus {
+      .button_blue:focus {
         background-color: #0073b7;
         color: #ffffff;
       }
@@ -137,12 +137,12 @@ ui <- dashboardPage(
             ),
             tabBox(
               title = "", width = NULL, id = "dc",
-              tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc"), hr(), downloadButton("downloadStep1de", "Download DE", class = "download_step_1_button"), ),
+              tabPanel("About", strong("Disjoint cell types detected?"), textOutput(outputId = "step1_dc"), hr(), uiOutput("downloadStep1deOutput")),
               tabPanel("DE", DT::DTOutput(outputId = "dc_de_tb") %>% withSpinner(color = "#FAD02C"))
             ),
             tabBox(
               title = "", width = NULL, id = "homo",
-              tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous"), hr(), downloadButton("downloadStep1hvg", "Download HVG", class = "download_step_1_button"), downloadButton("downloadStep1go", "Download GO", class = "download_step_1_button")),
+              tabPanel("About", strong("Homogeneous cells detected?"), textOutput(outputId = "step1_homogeneous"), hr(), uiOutput("downloadStep1hvgOutput"), uiOutput("downloadStep1goOutput")),
               tabPanel("HVGs", DT::DTOutput(outputId = "homo_hvgs_tb") %>% withSpinner(color = "#FAD02C")),
               tabPanel(
                 "GO",
@@ -200,10 +200,16 @@ ui <- dashboardPage(
                   "Step 1 only needs to be run once for any particular dataset, however its results are used in Step 2. 
                   Download and save the results to skip this step in the future.",
                   br(),
-                  downloadButton("downloadStep1Results", "Download Step 1 Results", class = "download_step_1_button"),
+                  br(),
+                  uiOutput("downloadStep1ResultsOutput"),
+                  br(),
+                  hr(),
+                  actionButton("go_to_generate_embeddings", label = "Go to next step (generate embeddings)"),
+                  hr(),
+                  "If you have already generated your own embeddings, please proceed directory to Step 2.",
                   br(),
                   br(),
-                  actionButton("go_to_generate_embeddings", label = "Go to next step"),
+                  actionButton("go_to_step2", label = "Go to Step 2"),
                 )
               )
             )
@@ -257,7 +263,9 @@ ui <- dashboardPage(
             # choose Trajectory methods
             selectInput("checkTraj", "Preliminary trajectory method", choices = c("Slingshot" = "Slingshot")),
             br(),
-            downloadButton(outputId = "downloadTraj", label = "Download embeddings (required for Step 2!)")
+            strong("Embeddings are required for step 2"),
+            br(),
+            downloadButton(outputId = "downloadTraj", label = "Download embeddings (required for Step 2!)", class = "button_blue")
           ),
           column(3, plotOutput("trajectory_plot_MDS", height = "auto") %>% withSpinner(color = "#FAD02C", id = "trajectory_plot_MDS_spinner")),
           column(3, plotOutput("trajectory_plot_TSNE", height = "auto") %>% withSpinner(color = "#FAD02C", id = "trajectory_plot_TSNE_spinner")),
