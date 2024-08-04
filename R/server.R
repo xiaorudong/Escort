@@ -125,12 +125,6 @@ server <- function(input, output, session) {
     }
   })
 
-  output$uploadnote <- renderText({
-    if (is.null(mydf$raw) || is.null(mydf$norm)) {
-      return("No datasets detected.")
-    }
-  })
-
 
   output$no_cells <- renderValueBox({
     if (mydf$from) {
@@ -444,6 +438,22 @@ server <- function(input, output, session) {
     return(NULL)
   })
 
+  output$uploadNormalFileToGenEmbeddingsUIOutput <- renderUI({
+    # If normal file was not uploaded in the first step, then show the upload option to the user
+    if (is.null(mydf$norm)) {
+      return(
+        tagList(
+          h4(strong("Generate embeddings:")),
+          fileInput("normalFileFromGenEmbeddings",
+            label = "If skipping Step 1 then upload your Normalized Data here to generate embeddings.",
+            buttonLabel = "Upload", accept = c(".csv", "rds")
+          )
+        )
+      )
+    }
+    return(NULL)
+  })
+
   # Visualization
   # output$step1_plot <- renderPlot({
   #   if(!mydf$from & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
@@ -471,15 +481,15 @@ server <- function(input, output, session) {
 
 
   # optional for uploading norm data in embedding
-  normalcounts <- reactive({
-    req(input$normalfile)
+  normalCountsObjFromGenEmbeddings <- reactive({
+    req(input$normalFileFromGenEmbeddings)
     tryCatch(
       {
-        if (grepl("\\.csv$", tolower(input$normalfile$name), ignore.case = TRUE)) {
-          mat <- read.csv(input$normalfile$datapath, row.names = 1)
+        if (grepl("\\.csv$", tolower(input$normalFileFromGenEmbeddings$name), ignore.case = TRUE)) {
+          mat <- read.csv(input$normalFileFromGenEmbeddings$datapath, row.names = 1)
           as.matrix(mat)
-        } else if (grepl("\\.rds$", tolower(input$normalfile$name), ignore.case = TRUE)) {
-          mat <- readRDS(input$normalfile$datapath)
+        } else if (grepl("\\.rds$", tolower(input$normalFileFromGenEmbeddings$name), ignore.case = TRUE)) {
+          mat <- readRDS(input$normalFileFromGenEmbeddings$datapath)
           if (!is.matrix(mat)) {
             stop("The RDS file must contain a matrix.")
           }
@@ -497,8 +507,8 @@ server <- function(input, output, session) {
 
 
 
-  observeEvent(input$normalfile, {
-    optional_normal_file <- normalcounts()
+  observeEvent(input$normalFileFromGenEmbeddings, {
+    optional_normal_file <- normalCountsObjFromGenEmbeddings()
     if (!is.null(optional_normal_file)) {
       mydf$norml <- optional_normal_file
       mydf$readyForEmbedding <- TRUE
@@ -691,13 +701,13 @@ server <- function(input, output, session) {
       shinyjs::disable("downloadTraj")
       return(NULL)
     }
-    # if the data is still not imported/ready then download button
-    # should be disabled
-    if (is.null(mydf$readyForEmbedding) || isFALSE(mydf$readyForEmbedding)) {
-      shinyjs::disable("downloadTraj")
-    } else {
-      # else enable the download button
+    # if it is ready for embedding (which means file was uploaded explicitly)
+    # of if the data was imported in the first step
+    # then in that case enable the download button
+    if (isTRUE(mydf$readyForEmbedding) || !is.null(mydf$norm)) {
       shinyjs::enable("downloadTraj")
+    } else {
+      shinyjs::disable("downloadTraj")
     }
   })
 
