@@ -76,15 +76,15 @@ server <- function(input, output, session) {
   ### load example data
   observeEvent(input$upload_example_data, {
     isolate({
-    raw_count_data_path <- system.file("data", "rawcount_linear_subdeg20.csv", package = "Escort")
-    rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
+      raw_count_data_path <- system.file("data", "rawcount_linear_subdeg20.csv", package = "Escort")
+      rawcount_linear_splatter <- read.csv(raw_count_data_path, row.names = 1)
 
-    norm_count_data_path <- system.file("data", "normcount_linear_subdeg20.csv", package = "Escort")
-    normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
+      norm_count_data_path <- system.file("data", "normcount_linear_subdeg20.csv", package = "Escort")
+      normcount_linear_splatter <- read.csv(norm_count_data_path, row.names = 1)
 
-    mydf$raw <- rawcount_linear_splatter
-    mydf$norm <- normcount_linear_splatter
-    mydf$from <- all(dim(rawcount_linear_splatter) == dim(normcount_linear_splatter))
+      mydf$raw <- rawcount_linear_splatter
+      mydf$norm <- normcount_linear_splatter
+      mydf$from <- all(dim(rawcount_linear_splatter) == dim(normcount_linear_splatter))
 
       showNotification("Example data is loading. Please wait.", type = "default", duration = 3)
     })
@@ -93,6 +93,11 @@ server <- function(input, output, session) {
   # go to generate embeddings tab on click of the go to generate embeddings button
   observeEvent(input$go_to_generate_embeddings, {
     updateTabItems(session, "tabs", "generate_embeddings")
+  })
+
+  # go to step 2 tab on click of the go to step 2 button
+  observeEvent(input$go_to_step2, {
+    updateTabItems(session, "tabs", "step2")
   })
 
   ### clear button
@@ -117,15 +122,6 @@ server <- function(input, output, session) {
         icon = icon("dna"),
         color = "orange"
       )
-    }
-  })
-
-  output$uploadnote <- renderText({
-    if (mydf$from) {
-      return("Datasets verified. Begin analysis.")
-    }
-    if (!mydf$from) {
-      return("No datasets detected.")
     }
   })
 
@@ -157,7 +153,6 @@ server <- function(input, output, session) {
   ############################################################################################
 
   step1_test2 <- reactive({
- 
     if (!mydf$from) {
       return(NULL)
     }
@@ -225,65 +220,6 @@ server <- function(input, output, session) {
     }
   )
 
-
-  # Observe and see if the download DE button should be shown or hidden based on conditions
-  observe({
-    shinyjs::hide("downloadStep1de")
-    if (!mydf$from) {
-      return(NULL)
-    }
-    if (is.null(step1_test2())) {
-      return(NULL)
-    }
-    if (step1_test2()$ifConnected) {
-      return(NULL)
-    }
-    if (!is.null(step1_de())) {
-      shinyjs::show("downloadStep1de")
-    } else {
-      shinyjs::hide("downloadStep1de")
-    }
-  })
-
-  # Observe and see if the download HVG button should be shown or hidden based on conditions
-  observe({
-    shinyjs::hide("downloadStep1hvg")
-    if (!mydf$from) {
-      return(NULL)
-    }
-    if (is.null(step1_test1())) {
-      return(NULL)
-    }
-    if (step1_test1()$signal_pct >= 0.46) {
-      return(NULL)
-    }
-    if (!is.null(step1_hvgs())) {
-      shinyjs::show("downloadStep1hvg")
-    } else {
-      shinyjs::hide("downloadStep1hvg")
-    }
-  })
-
-  # Observe and see if the download Go button should be shown or hidden based on conditions
-  observe({
-    shinyjs::hide("downloadStep1go")
-    if (!mydf$from) {
-      return(NULL)
-    }
-    if (is.null(step1_test1())) {
-      return(NULL)
-    }
-    if (step1_test1()$signal_pct >= 0.46) {
-      return(NULL)
-    }
-    if (!is.null(step1_go())) {
-      shinyjs::show("downloadStep1go")
-    } else {
-      shinyjs::hide("downloadStep1go")
-    }
-  })
-
-
   # DE in DC clusters:
   step1_de <- reactive({
     if (!step1_test2()$ifConnected) {
@@ -316,16 +252,15 @@ server <- function(input, output, session) {
   ############################################################################################
 
   step1_test1 <- reactive({
-
     if (!mydf$from) {
       return(NULL)
     }
     norm_mat <- mydf$norm
     withProgress(message = "Testing for homogeneous cells", value = 0, {
-        incProgress(1/2)
-         return(Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000))
-        incProgress(1)
-      })
+      incProgress(1 / 2)
+      return(Escort::step1_testHomogeneous(normcounts = norm_mat, num.sim = 1000))
+      incProgress(1)
+    })
   })
 
   output$step1_homogeneous <- renderText({
@@ -442,6 +377,83 @@ server <- function(input, output, session) {
     }
   })
 
+  output$downloadStep1deOutput <- renderUI({
+    if (!mydf$from) {
+      return(NULL)
+    }
+    if (is.null(step1_test2())) {
+      return(NULL)
+    }
+    if (step1_test2()$ifConnected) {
+      return(NULL)
+    }
+    if (!is.null(step1_de())) {
+      return(downloadButton("downloadStep1de", "Download DE", class = "button_blue"))
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$downloadStep1hvgOutput <- renderUI({
+    if (!mydf$from) {
+      return(NULL)
+    }
+    if (is.null(step1_test1())) {
+      return(NULL)
+    }
+    if (step1_test1()$signal_pct >= 0.46) {
+      return(NULL)
+    }
+    if (!is.null(step1_hvgs())) {
+      return(downloadButton("downloadStep1hvg", "Download HVG", class = "button_blue"))
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$downloadStep1goOutput <- renderUI({
+    if (!mydf$from) {
+      return(NULL)
+    }
+    if (is.null(step1_test1())) {
+      return(NULL)
+    }
+    if (step1_test1()$signal_pct >= 0.46) {
+      return(NULL)
+    }
+    if (!is.null(step1_go())) {
+      return(downloadButton("downloadStep1go", "Download GO", class = "button_blue"))
+    } else {
+      return(NULL)
+    }
+  })
+
+  output$downloadStep1ResultsOutput <- renderUI({
+    if (!mydf$from) {
+      return(NULL)
+    }
+    if (step1_res()) {
+      return(downloadButton("downloadStep1Results", "Download Step 1 Results", class = "button_blue"))
+    }
+    return(NULL)
+  })
+
+  output$uploadNormalFileToGenEmbeddingsUIOutput <- renderUI({
+    # If normal file was not uploaded in the first step, then show the upload option to the user
+    if (is.null(mydf$norm)) {
+      return(
+        tagList(
+          h4(strong("Generate embeddings:")),
+          fileInput("normalFileFromGenEmbeddings",
+            label = "If skipping Step 1 then upload your Normalized Data here to generate embeddings.",
+            buttonLabel = "Upload", accept = c(".csv", "rds")
+          )
+        )
+      )
+    }
+    return(NULL)
+  })
+
   # Visualization
   # output$step1_plot <- renderPlot({
   #   if(!mydf$from & is.null(step1_test1()) & is.null(step1_test2())) return(NULL)
@@ -469,15 +481,15 @@ server <- function(input, output, session) {
 
 
   # optional for uploading norm data in embedding
-  normalcounts <- reactive({
-    req(input$normalfile)
+  normalCountsObjFromGenEmbeddings <- reactive({
+    req(input$normalFileFromGenEmbeddings)
     tryCatch(
       {
-        if (grepl("\\.csv$", tolower(input$normalfile$name), ignore.case = TRUE)) {
-          mat <- read.csv(input$normalfile$datapath, row.names = 1)
+        if (grepl("\\.csv$", tolower(input$normalFileFromGenEmbeddings$name), ignore.case = TRUE)) {
+          mat <- read.csv(input$normalFileFromGenEmbeddings$datapath, row.names = 1)
           as.matrix(mat)
-        } else if (grepl("\\.rds$", tolower(input$normalfile$name), ignore.case = TRUE)) {
-          mat <- readRDS(input$normalfile$datapath)
+        } else if (grepl("\\.rds$", tolower(input$normalFileFromGenEmbeddings$name), ignore.case = TRUE)) {
+          mat <- readRDS(input$normalFileFromGenEmbeddings$datapath)
           if (!is.matrix(mat)) {
             stop("The RDS file must contain a matrix.")
           }
@@ -495,8 +507,8 @@ server <- function(input, output, session) {
 
 
 
-  observeEvent(input$normalfile, {
-    optional_normal_file <- normalcounts()
+  observeEvent(input$normalFileFromGenEmbeddings, {
+    optional_normal_file <- normalCountsObjFromGenEmbeddings()
     if (!is.null(optional_normal_file)) {
       mydf$norml <- optional_normal_file
       mydf$readyForEmbedding <- TRUE
@@ -689,13 +701,13 @@ server <- function(input, output, session) {
       shinyjs::disable("downloadTraj")
       return(NULL)
     }
-    # if the data is still not imported/ready then download button
-    # should be disabled
-    if (isFALSE(mydf$readyForEmbedding) || is.null(mydf$norm)) {
-      shinyjs::disable("downloadTraj")
-    } else {
-      # else enable the download button
+    # if it is ready for embedding (which means file was uploaded explicitly)
+    # of if the data was imported in the first step
+    # then in that case enable the download button
+    if (isTRUE(mydf$readyForEmbedding) || !is.null(mydf$norm)) {
       shinyjs::enable("downloadTraj")
+    } else {
+      shinyjs::disable("downloadTraj")
     }
   })
 
